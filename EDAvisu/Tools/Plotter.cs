@@ -50,7 +50,7 @@ namespace EDAvisu.Tools
         {
             LinearAxis linearAxis = new LinearAxis
             {
-                Title = line.Title,
+                Title = "kWh",          //line.Title,
                 Key = line.YAxisKey,
                 Position = pos,
 
@@ -106,8 +106,8 @@ namespace EDAvisu.Tools
                         line.Points.Add(new DataPoint(DateTimeAxis.ToDouble(time[i]), dp.Points[i]));
                 }
 
-                //model.Axes[0].Reset();
-                //model.Axes[1].Reset();
+                model.Axes[0].Reset();
+                model.Axes[1].Reset();
 
                 return true;
             }
@@ -120,21 +120,27 @@ namespace EDAvisu.Tools
             model.Axes.Add(new DateTimeAxis() { Position = AxisPosition.Bottom });
 
             PowerMeter pm;
+            DataSeries ds;
             List<DateTime> ts;
 
             // add each powermeter
             for (int meter = 0; meter < usr.Data.Count; meter++)
             {
                 pm = usr.Data[meter];
+                ds = pm.Series;
                 ts = usr.Timestamps;
 
-                AddLine("CON-TOTAL", pm, ts, pm.Series.Consumed_Total_kWh, from, to);
-                AddLine("EEG-Max", pm, ts, pm.Series.FromEEG_MaxAvaliable_kWh, from, to);
-                AddLine("EEG-Verb", pm, ts, pm.Series.FromEEG_Consumed_kWh, from, to);
+                AddLine("CON-TOTAL", pm, ts, ds.Consumed_Total_kWh, from, to);
+                AddLine("EEG-Max", pm, ts, ds.FromEEG_MaxAvaliable_kWh, from, to);
+                AddLine("EEG-Verb", pm, ts, ds.FromEEG_Consumed_kWh, from, to);
 
-                AddLine("GEN-TOTAL", pm, ts, pm.Series.Produced_Total_kWh, from, to);
-                AddLine("ToGRID, ", pm, ts, pm.Series.ToGrid_kWh, from, to);
-                AddLine("ToEEG", pm, ts, pm.Series.ToEEG_kWh, from, to);
+                AddLine("GEN-TOTAL", pm, ts, ds.Produced_Total_kWh, from, to);
+                AddLine("ToGRID", pm, ts, ds.ToGrid_kWh, from, to);
+                AddLine("ToEEG", pm, ts, ds.ToEEG_kWh, from, to);
+
+                // add tracker-format if a new LineSeries was created
+                if(model.Series.Count > 0)
+                    model.Series[model.Series.Count - 1].TrackerFormatString = "{0}\n{2:dd-MM-yyyy HH:mm}: {4:0.00}kWh";
             }
         }
 

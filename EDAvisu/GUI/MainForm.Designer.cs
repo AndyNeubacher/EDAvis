@@ -205,7 +205,7 @@
             this.objectListView.Location = new System.Drawing.Point(0, 35);
             this.objectListView.Name = "objectListView";
             this.objectListView.ShowImagesOnSubItems = true;
-            this.objectListView.Size = new System.Drawing.Size(451, 447);
+            this.objectListView.Size = new System.Drawing.Size(450, 447);
             this.objectListView.TabIndex = 1;
             this.objectListView.UseCompatibleStateImageBehavior = false;
             this.objectListView.UseSubItemCheckBoxes = true;
@@ -221,7 +221,7 @@
             this.DataQuality.Text = "DatenQuality";
             this.DataQuality.ToolTipText = "L1=gemessener Wert  |  L2=Wert kann sich noch ändern  |  L3=Ersatzwert, nicht ver" +
     "wenden!";
-            this.DataQuality.Width = 30;
+            this.DataQuality.Width = 40;
             // 
             // Type
             // 
@@ -326,7 +326,7 @@
             this.SelectedDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.SelectedDateTo.Location = new System.Drawing.Point(326, 3);
             this.SelectedDateTo.Name = "SelectedDateTo";
-            this.SelectedDateTo.Size = new System.Drawing.Size(116, 20);
+            this.SelectedDateTo.Size = new System.Drawing.Size(115, 20);
             this.SelectedDateTo.TabIndex = 5;
             // 
             // splitContainer
@@ -347,6 +347,8 @@
             this.splitContainer.Panel2.Controls.Add(this.objectListView);
             this.splitContainer.Size = new System.Drawing.Size(935, 482);
             this.splitContainer.SplitterDistance = 480;
+            this.splitContainer.SplitterIncrement = 10;
+            this.splitContainer.SplitterWidth = 5;
             this.splitContainer.TabIndex = 7;
             // 
             // OxyPlotView
@@ -380,7 +382,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(445, 26);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(444, 26);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
             // btnAll

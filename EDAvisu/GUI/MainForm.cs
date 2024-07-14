@@ -1,6 +1,8 @@
 ﻿using BrightIdeasSoftware;
 using EDAvisu.Tools;
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -17,10 +19,20 @@ namespace EDAvisu
         public MainForm()
         {
             InitializeComponent();
+            nea();
 
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
             this.Text = "EDAvisu V" + ver.ToString();
         }
+
+        [Conditional("RELEASE")]
+        private void nea()
+        {
+            // only add the eventhandler in the releasebuild -> avoid 
+            this.SelectedDateTo.ValueChanged += new System.EventHandler(this.SelectedDateTo_ValueChanged);
+            this.SelectedDateFrom.ValueChanged += new System.EventHandler(this.SelectedDateFrom_ValueChanged);
+        }
+
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
