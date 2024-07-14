@@ -68,14 +68,14 @@ namespace EDAvisu.Tools
                 PositionTier = idx,
 
                 IsPanEnabled = true,
-                IsAxisVisible = false,
+                IsAxisVisible = true,
                 IsZoomEnabled = true
             };
 
             return linearAxis;
         }
 
-        private bool AddLine(string legend, List<DateTime> time, DataPoints dp, DateTime from, DateTime to)
+        private bool AddLine(string pwr_direction, PowerMeter pm, List<DateTime> time, DataPoints dp, DateTime from, DateTime to)
         {
             try
             {
@@ -88,12 +88,16 @@ namespace EDAvisu.Tools
                 if (time.Count != dp.Points.Count)
                     return false;
 
-                //string legend_text = pm.Type.Substring(0, 3) + ": ";
-                //legend_text += "AT**" + pm.PM_ID.Substring(pm.PM_ID.Length - 8) + ", " + pm.User.Name;
+                string legend_text = pm.Type.Substring(0, 3) + ": ";
+                legend_text += (pm.PM_ID.Length == 0) ? "" : "AT**" + pm.PM_ID.Substring(pm.PM_ID.Length - 6);
+                legend_text += ", " + pm.User.Name + ", " + pwr_direction;
 
-                LineSeries line = new LineSeries() { Title = legend, MarkerType = MarkerType.Circle, Color = OxyColors.Automatic };
+                LineSeries line = new LineSeries() { Title = legend_text, MarkerType = MarkerType.Circle, Color = OxyColors.Automatic };
                 model.Series.Add(line);
-                model.Axes.Add(NewAxis(model.Axes.Count, line, AxisPosition.Left));
+
+                // check if we need a Y-axes (but only 1!)
+                if (model.Axes.Count < 2)
+                    model.Axes.Add(NewAxis(model.Axes.Count, line, AxisPosition.Left));
 
                 // now fill the datapoints
                 for (int i = 0; i < dp.Points.Count; i++)
@@ -102,7 +106,8 @@ namespace EDAvisu.Tools
                         line.Points.Add(new DataPoint(DateTimeAxis.ToDouble(time[i]), dp.Points[i]));
                 }
 
-                model.Axes[model.Axes.Count-1].Reset();
+                //model.Axes[0].Reset();
+                //model.Axes[1].Reset();
 
                 return true;
             }
@@ -115,72 +120,22 @@ namespace EDAvisu.Tools
             model.Axes.Add(new DateTimeAxis() { Position = AxisPosition.Bottom });
 
             PowerMeter pm;
+            List<DateTime> ts;
 
             // add each powermeter
             for (int meter = 0; meter < usr.Data.Count; meter++)
             {
                 pm = usr.Data[meter];
+                ts = usr.Timestamps;
 
-                //legend_text = pm.Type.Substring(0, 3) + ": ";
-                ////legend_text += "AT**" + pm.PM_ID.Substring(pm.PM_ID.Length - 8) + ", " + pm.User.Name;
+                AddLine("CON-TOTAL", pm, ts, pm.Series.Consumed_Total_kWh, from, to);
+                AddLine("EEG-Max", pm, ts, pm.Series.FromEEG_MaxAvaliable_kWh, from, to);
+                AddLine("EEG-Verb", pm, ts, pm.Series.FromEEG_Consumed_kWh, from, to);
 
-                //LineSeries ls = new LineSeries() { Title = legend_text, MarkerType = MarkerType.Circle, Color = OxyColors.Automatic };
-                //model.Series.Add(ls);
-                //model.Axes.Add(NewAxis(meter + 1, ls, AxisPosition.Left));
-
-                AddLine("CON-TOTAL", usr.Timestamps, pm.Series.Consumed_Total_kWh, from, to);
-                AddLine("EEG-Max", usr.Timestamps, pm.Series.FromEEG_MaxAvaliable_kWh, from, to);
-                AddLine("EEG-Verb", usr.Timestamps, pm.Series.FromEEG_Consumed_kWh, from, to);
-
-                AddLine("PROD-TOTAL", usr.Timestamps, pm.Series.Produced_Total_kWh, from, to);
-                AddLine("PROD-ToGRID, ", usr.Timestamps, pm.Series.ToGrid_kWh, from, to);
-                AddLine("PROD-ToEEG", usr.Timestamps, pm.Series.ToEEG_kWh, from, to);
-
-                //for (int dp = 0; dp < usr.Timestamps.Count; dp++)
-                //{
-                //    if ((usr.Timestamps[dp] >= from) && (usr.Timestamps[dp] <= to))
-                //    {
-                //        if((pm.Series.Consumed_Total_kWh != null) && (pm.Series.Consumed_Total_kWh.Visible))
-                //            (model.Series[meter] as LineSeries).Points.Add(new DataPoint(DateTimeAxis.ToDouble(usr.Timestamps[dp]), pm.Points.FromEEG_Consumed_kWh[dp]));    // used from EEG
-                //    }
-                //}
-                //model.Axes[meter].Reset();
+                AddLine("GEN-TOTAL", pm, ts, pm.Series.Produced_Total_kWh, from, to);
+                AddLine("ToGRID, ", pm, ts, pm.Series.ToGrid_kWh, from, to);
+                AddLine("ToEEG", pm, ts, pm.Series.ToEEG_kWh, from, to);
             }
-
-            // add TOTAL generation and consumption
-            //int idx_con_tot = usr.PmData.Count;
-            //int idx_gen_tot = usr.PmData.Count + 1;
-            //int idx_to_grid = usr.PmData.Count + 2;
-            //int idx_eeg = usr.PmData.Count + 3;
-            //LineSeries con_tot = new LineSeries() { Title = "CON: TOTAL", MarkerType = MarkerType.Circle, Color = OxyColors.Automatic };
-            //LineSeries gen_tot = new LineSeries() { Title = "GEN: TOTAL", MarkerType = MarkerType.Circle, Color = OxyColors.Automatic };
-            //LineSeries gen_togrid = new LineSeries() { Title = "GEN: ToGrid", MarkerType = MarkerType.Circle, Color = OxyColors.Automatic };
-            //LineSeries con_eeg = new LineSeries() { Title = "CON: FromEEG", MarkerType = MarkerType.Circle, Color = OxyColors.Automatic };
-            //model.Series.Add(con_tot);
-            //model.Series.Add(gen_tot);
-            //model.Series.Add(gen_togrid);
-            //model.Series.Add(con_eeg);
-            //model.Axes.Add(NewAxis(idx_con_tot + 1, con_tot, AxisPosition.Left));
-            //model.Axes.Add(NewAxis(idx_gen_tot + 2, gen_tot, AxisPosition.Left));
-            //model.Axes.Add(NewAxis(idx_to_grid + 3, gen_togrid, AxisPosition.Left));
-            //model.Axes.Add(NewAxis(idx_eeg + 4, con_eeg, AxisPosition.Left));
-
-
-            //for (int dp = 0; dp < usr.Timestamps.Count; dp++)
-            //{
-            //    if ((usr.Timestamps[dp] >= from) && (usr.Timestamps[dp] <= to))
-            //    {
-            //        (model.Series[idx_con_tot] as LineSeries).Points.Add(new DataPoint(DateTimeAxis.ToDouble(usr.Timestamps[dp]), usr.ConsumptionTotal_kWh[dp]));
-            //        (model.Series[idx_gen_tot] as LineSeries).Points.Add(new DataPoint(DateTimeAxis.ToDouble(usr.Timestamps[dp]), usr.ProducedTotal_kWh[dp]));
-            //        (model.Series[idx_to_grid] as LineSeries).Points.Add(new DataPoint(DateTimeAxis.ToDouble(usr.Timestamps[dp]), usr.ToGrid_KWh[dp]));
-            //        (model.Series[idx_eeg] as LineSeries).Points.Add(new DataPoint(DateTimeAxis.ToDouble(usr.Timestamps[dp]), usr.FromEEG_kWh[dp]));
-            //    }
-            //}
-
-            //model.Axes[idx_con_tot].Reset();
-            //model.Axes[idx_gen_tot].Reset();
-            //model.Axes[idx_to_grid].Reset();
-            //model.Axes[idx_eeg].Reset();
         }
 
         public void ShowBarGraph(UserNamesAndDataPoints data, DateTime from, DateTime to)

@@ -216,10 +216,12 @@
             this.DataQuality.AspectName = "DataQuality";
             this.DataQuality.IsEditable = false;
             this.DataQuality.IsHeaderVertical = true;
+            this.DataQuality.MaximumWidth = 40;
+            this.DataQuality.MinimumWidth = 20;
             this.DataQuality.Text = "DatenQuality";
             this.DataQuality.ToolTipText = "L1=gemessener Wert  |  L2=Wert kann sich noch ändern  |  L3=Ersatzwert, nicht ver" +
     "wenden!";
-            this.DataQuality.Width = 59;
+            this.DataQuality.Width = 30;
             // 
             // Type
             // 
