@@ -1,14 +1,12 @@
 ﻿using BrightIdeasSoftware;
-using EDAvisu.Tools;
+using EDAvis.Tools;
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
 
 
 
-namespace EDAvisu
+namespace EDAvis
 {
     public partial class MainForm : Form
     {
@@ -19,20 +17,16 @@ namespace EDAvisu
         public MainForm()
         {
             InitializeComponent();
-            nea();
+
+            #if (!DEBUG)
+            // only add the eventhandler in the releasebuild -> ugly bugfix of the .NET framework
+            this.SelectedDateTo.ValueChanged += new System.EventHandler(this.SelectedDateTo_ValueChanged);
+            this.SelectedDateFrom.ValueChanged += new System.EventHandler(this.SelectedDateFrom_ValueChanged);
+            #endif
 
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
             this.Text = "EDAvis V" + ver.ToString();
         }
-
-        [Conditional("RELEASE")]
-        private void nea()
-        {
-            // only add the eventhandler in the releasebuild -> avoid 
-            this.SelectedDateTo.ValueChanged += new System.EventHandler(this.SelectedDateTo_ValueChanged);
-            this.SelectedDateFrom.ValueChanged += new System.EventHandler(this.SelectedDateFrom_ValueChanged);
-        }
-
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -49,7 +43,8 @@ namespace EDAvisu
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    User_Data = ExcelReport.GetData(openFileDialog.FileName);
+                    User_Data = ExcelReport_EPPlus.GetData(openFileDialog.FileName);
+                    //User_Data = ExcelReport_Interop.GetData(openFileDialog.FileName);
                     objectListView.SetObjects(User_Data.Data);
                     objectListView.AutoResizeColumns();                    
                     UpdateGraph();

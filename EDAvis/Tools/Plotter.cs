@@ -6,7 +6,7 @@ using OxyPlot.Legends;
 using System;
 using System.Collections.Generic;
 
-namespace EDAvisu.Tools
+namespace EDAvis.Tools
 {
     public class Plotter
     {
@@ -123,6 +123,9 @@ namespace EDAvisu.Tools
             DataSeries ds;
             List<DateTime> ts;
 
+            DateTime from_midnight = new DateTime(from.Year, from.Month, from.Day, 0, 0, 0);
+            DateTime to_midnight = new DateTime(to.Year, to.Month, to.Day, 0, 0, 0);
+
             // add each powermeter
             for (int meter = 0; meter < usr.Data.Count; meter++)
             {
@@ -130,17 +133,17 @@ namespace EDAvisu.Tools
                 ds = pm.Series;
                 ts = usr.Timestamps;
 
-                AddLine("CON-TOTAL", pm, ts, ds.Consumed_Total_kWh, from, to);
-                AddLine("EEG-Max", pm, ts, ds.FromEEG_MaxAvaliable_kWh, from, to);
-                AddLine("EEG-Verb", pm, ts, ds.FromEEG_Consumed_kWh, from, to);
+                AddLine("CON-TOTAL", pm, ts, ds.Consumed_Total_kWh, from_midnight, to_midnight);
+                AddLine("EEG-Max", pm, ts, ds.FromEEG_MaxAvaliable_kWh, from_midnight, to_midnight);
+                AddLine("EEG-Verb", pm, ts, ds.FromEEG_Consumed_kWh, from_midnight, to_midnight);
 
-                AddLine("GEN-TOTAL", pm, ts, ds.Produced_Total_kWh, from, to);
-                AddLine("ToGRID", pm, ts, ds.ToGrid_kWh, from, to);
-                AddLine("ToEEG", pm, ts, ds.ToEEG_kWh, from, to);
+                AddLine("GEN-TOTAL", pm, ts, ds.Produced_Total_kWh, from_midnight, to_midnight);
+                AddLine("ToGRID", pm, ts, ds.ToGrid_kWh, from_midnight, to_midnight);
+                AddLine("ToEEG", pm, ts, ds.ToEEG_kWh, from_midnight, to_midnight);
 
                 // add tracker-format if a new LineSeries was created
                 if(model.Series.Count > 0)
-                    model.Series[model.Series.Count - 1].TrackerFormatString = "{0}\n{2:dd-MM-yyyy HH:mm}: {4:0.00}kWh";
+                    model.Series[model.Series.Count - 1].TrackerFormatString = "{0}\n{2:dd-MM-yyyy HH:mm}: {4:0.000}kWh";
             }
         }
 

@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 
 
-namespace EDAvisu.Tools
+namespace EDAvis.Tools
 {
-    public class ExcelReport
+    public class ExcelReport_Interop
     {
         public static UserNamesAndDataPoints GetData(string xls_file)
         {

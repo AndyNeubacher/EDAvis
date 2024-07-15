@@ -1,4 +1,4 @@
-﻿namespace EDAvisu
+﻿namespace EDAvis
 {
     partial class MainForm
     {
@@ -205,7 +205,7 @@
             this.objectListView.Location = new System.Drawing.Point(0, 35);
             this.objectListView.Name = "objectListView";
             this.objectListView.ShowImagesOnSubItems = true;
-            this.objectListView.Size = new System.Drawing.Size(450, 447);
+            this.objectListView.Size = new System.Drawing.Size(446, 445);
             this.objectListView.TabIndex = 1;
             this.objectListView.UseCompatibleStateImageBehavior = false;
             this.objectListView.UseSubItemCheckBoxes = true;
@@ -316,7 +316,7 @@
             this.SelectedDateFrom.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.SelectedDateFrom.Location = new System.Drawing.Point(3, 3);
             this.SelectedDateFrom.Name = "SelectedDateFrom";
-            this.SelectedDateFrom.Size = new System.Drawing.Size(113, 20);
+            this.SelectedDateFrom.Size = new System.Drawing.Size(112, 20);
             this.SelectedDateFrom.TabIndex = 3;
             // 
             // SelectedDateTo
@@ -324,7 +324,7 @@
             this.SelectedDateTo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SelectedDateTo.DropDownAlign = System.Windows.Forms.LeftRightAlignment.Right;
             this.SelectedDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.SelectedDateTo.Location = new System.Drawing.Point(326, 3);
+            this.SelectedDateTo.Location = new System.Drawing.Point(322, 3);
             this.SelectedDateTo.Name = "SelectedDateTo";
             this.SelectedDateTo.Size = new System.Drawing.Size(115, 20);
             this.SelectedDateTo.TabIndex = 5;
@@ -334,6 +334,7 @@
             this.splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.splitContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainer.Location = new System.Drawing.Point(12, 27);
             this.splitContainer.Name = "splitContainer";
             // 
@@ -357,7 +358,7 @@
             this.OxyPlotView.Location = new System.Drawing.Point(0, 0);
             this.OxyPlotView.Name = "OxyPlotView";
             this.OxyPlotView.PanCursor = System.Windows.Forms.Cursors.Hand;
-            this.OxyPlotView.Size = new System.Drawing.Size(480, 482);
+            this.OxyPlotView.Size = new System.Drawing.Size(478, 480);
             this.OxyPlotView.TabIndex = 1;
             this.OxyPlotView.ZoomHorizontalCursor = System.Windows.Forms.Cursors.SizeWE;
             this.OxyPlotView.ZoomRectangleCursor = System.Windows.Forms.Cursors.SizeNWSE;
@@ -382,15 +383,15 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(444, 26);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(440, 26);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
             // btnAll
             // 
             this.btnAll.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnAll.Location = new System.Drawing.Point(258, 3);
+            this.btnAll.Location = new System.Drawing.Point(255, 3);
             this.btnAll.Name = "btnAll";
-            this.btnAll.Size = new System.Drawing.Size(62, 20);
+            this.btnAll.Size = new System.Drawing.Size(61, 20);
             this.btnAll.TabIndex = 9;
             this.btnAll.Text = "Alle";
             this.btnAll.UseVisualStyleBackColor = true;
@@ -399,9 +400,9 @@
             // btnNone
             // 
             this.btnNone.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnNone.Location = new System.Drawing.Point(122, 3);
+            this.btnNone.Location = new System.Drawing.Point(121, 3);
             this.btnNone.Name = "btnNone";
-            this.btnNone.Size = new System.Drawing.Size(62, 20);
+            this.btnNone.Size = new System.Drawing.Size(61, 20);
             this.btnNone.TabIndex = 8;
             this.btnNone.Text = "Nichts";
             this.btnNone.UseVisualStyleBackColor = true;
@@ -410,9 +411,9 @@
             // btnUpdate
             // 
             this.btnUpdate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnUpdate.Location = new System.Drawing.Point(190, 3);
+            this.btnUpdate.Location = new System.Drawing.Point(188, 3);
             this.btnUpdate.Name = "btnUpdate";
-            this.btnUpdate.Size = new System.Drawing.Size(62, 20);
+            this.btnUpdate.Size = new System.Drawing.Size(61, 20);
             this.btnUpdate.TabIndex = 7;
             this.btnUpdate.Text = "Update";
             this.btnUpdate.UseVisualStyleBackColor = true;
@@ -426,7 +427,6 @@
             this.Controls.Add(this.splitContainer);
             this.Controls.Add(this.menuStrip);
             this.Name = "MainForm";
-            this.Text = "EDAvisu";
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.objectListView)).EndInit();
