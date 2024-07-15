@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDAvisu", "EDAvisu\EDAvisu.csproj", "{FB6A077B-E713-4B4D-9F16-2CC5D22DF04C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDAvisu", "EDAvis\EDAvis.csproj", "{FB6A077B-E713-4B4D-9F16-2CC5D22DF04C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

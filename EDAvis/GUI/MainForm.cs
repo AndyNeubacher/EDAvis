@@ -22,7 +22,7 @@ namespace EDAvisu
             nea();
 
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
-            this.Text = "EDAvisu V" + ver.ToString();
+            this.Text = "EDAvis V" + ver.ToString();
         }
 
         [Conditional("RELEASE")]
