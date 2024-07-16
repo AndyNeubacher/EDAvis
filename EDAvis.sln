@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDAvisu", "EDAvis\EDAvis.csproj", "{FB6A077B-E713-4B4D-9F16-2CC5D22DF04C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EDAvis", "EDAvis\EDAvis.csproj", "{FB6A077B-E713-4B4D-9F16-2CC5D22DF04C}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EDAvisSetup", "EDAvisSetup\EDAvisSetup.vdproj", "{57570CB6-615A-4FF6-B00C-E23AF966BEB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{FB6A077B-E713-4B4D-9F16-2CC5D22DF04C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB6A077B-E713-4B4D-9F16-2CC5D22DF04C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB6A077B-E713-4B4D-9F16-2CC5D22DF04C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57570CB6-615A-4FF6-B00C-E23AF966BEB9}.Debug|Any CPU.ActiveCfg = Debug
+		{57570CB6-615A-4FF6-B00C-E23AF966BEB9}.Debug|Any CPU.Build.0 = Debug
+		{57570CB6-615A-4FF6-B00C-E23AF966BEB9}.Release|Any CPU.ActiveCfg = Release
+		{57570CB6-615A-4FF6-B00C-E23AF966BEB9}.Release|Any CPU.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
