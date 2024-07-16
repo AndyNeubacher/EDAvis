@@ -1,4 +1,5 @@
 ﻿using BrightIdeasSoftware;
+using EDAvis.GUI;
 using EDAvis.Tools;
 using System;
 using System.Reflection;
@@ -120,6 +121,12 @@ namespace EDAvis
         private void btnAll_Click(object sender, EventArgs e)
         {
             SetAllSubItemCheckboxes(true);
+        }
+
+        private void überToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutForm about = new AboutForm();
+            about.ShowDialog();
         }
     }
 }

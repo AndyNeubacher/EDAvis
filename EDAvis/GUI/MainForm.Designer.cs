@@ -124,22 +124,24 @@
             this.lineToolStripMenuItem,
             this.barToolStripMenuItem});
             this.typeToolStripMenuItem.Name = "typeToolStripMenuItem";
-            this.typeToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.typeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.typeToolStripMenuItem.Text = "Type";
             // 
             // lineToolStripMenuItem
             // 
             this.lineToolStripMenuItem.Checked = true;
             this.lineToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.lineToolStripMenuItem.Enabled = false;
             this.lineToolStripMenuItem.Name = "lineToolStripMenuItem";
-            this.lineToolStripMenuItem.Size = new System.Drawing.Size(96, 22);
+            this.lineToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.lineToolStripMenuItem.Text = "Line";
             this.lineToolStripMenuItem.Click += new System.EventHandler(this.lineToolStripMenuItem_Click);
             // 
             // barToolStripMenuItem
             // 
+            this.barToolStripMenuItem.Enabled = false;
             this.barToolStripMenuItem.Name = "barToolStripMenuItem";
-            this.barToolStripMenuItem.Size = new System.Drawing.Size(96, 22);
+            this.barToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.barToolStripMenuItem.Text = "Bar";
             this.barToolStripMenuItem.Click += new System.EventHandler(this.barToolStripMenuItem_Click);
             // 
@@ -155,6 +157,7 @@
             // 
             // nachUpdatesSuchenToolStripMenuItem
             // 
+            this.nachUpdatesSuchenToolStripMenuItem.Enabled = false;
             this.nachUpdatesSuchenToolStripMenuItem.Name = "nachUpdatesSuchenToolStripMenuItem";
             this.nachUpdatesSuchenToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.nachUpdatesSuchenToolStripMenuItem.Text = "Nach Updates suchen";
@@ -169,6 +172,7 @@
             this.überToolStripMenuItem.Name = "überToolStripMenuItem";
             this.überToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.überToolStripMenuItem.Text = "Info";
+            this.überToolStripMenuItem.Click += new System.EventHandler(this.überToolStripMenuItem_Click);
             // 
             // objectListView
             // 
@@ -205,7 +209,7 @@
             this.objectListView.Location = new System.Drawing.Point(0, 35);
             this.objectListView.Name = "objectListView";
             this.objectListView.ShowImagesOnSubItems = true;
-            this.objectListView.Size = new System.Drawing.Size(446, 445);
+            this.objectListView.Size = new System.Drawing.Size(445, 445);
             this.objectListView.TabIndex = 1;
             this.objectListView.UseCompatibleStateImageBehavior = false;
             this.objectListView.UseSubItemCheckBoxes = true;
@@ -326,7 +330,7 @@
             this.SelectedDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.SelectedDateTo.Location = new System.Drawing.Point(322, 3);
             this.SelectedDateTo.Name = "SelectedDateTo";
-            this.SelectedDateTo.Size = new System.Drawing.Size(115, 20);
+            this.SelectedDateTo.Size = new System.Drawing.Size(114, 20);
             this.SelectedDateTo.TabIndex = 5;
             // 
             // splitContainer
@@ -383,7 +387,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(440, 26);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(439, 26);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
             // btnAll
