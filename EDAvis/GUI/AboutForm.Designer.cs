@@ -56,9 +56,9 @@
             this.lblVersion.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblVersion.Location = new System.Drawing.Point(46, 150);
             this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(117, 20);
+            this.lblVersion.Size = new System.Drawing.Size(82, 20);
             this.lblVersion.TabIndex = 1;
-            this.lblVersion.Text = "Version: V0.1.0";
+            this.lblVersion.Text = "Version: V";
             // 
             // label2
             // 

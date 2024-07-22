@@ -44,8 +44,14 @@ namespace EDAvis
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    User_Data = ExcelReport_EPPlus.GetData(openFileDialog.FileName);
                     //User_Data = ExcelReport_Interop.GetData(openFileDialog.FileName);
+                    User_Data = ExcelReport_EPPlus.GetData(openFileDialog.FileName);
+                    if (User_Data.Timestamps.Count > 0)
+                    {
+                        SelectedDateFrom.Value = User_Data.Timestamps[0];
+                        SelectedDateTo.Value = User_Data.Timestamps[User_Data.Timestamps.Count - 1];
+                    }
+
                     objectListView.SetObjects(User_Data.Data);
                     objectListView.AutoResizeColumns();                    
                     UpdateGraph();
