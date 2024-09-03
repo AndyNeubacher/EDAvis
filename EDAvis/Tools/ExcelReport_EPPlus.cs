@@ -218,6 +218,9 @@ namespace EDAvis.Tools
             {
                 for(int row=1; row< num_rows; row++)
                 {
+                    if (range[row, 1].Value == null)
+                        continue;
+
                     string x = range[row, 1].Value.ToString();
                     if (range[row, 1].Value.ToString() == keyword)
                         return row;
