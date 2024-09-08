@@ -362,3 +362,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/desktop.ini
+/EDAvisSetup/desktop.ini
+/EDAvis/Tools/desktop.ini
+/EDAvis/Properties/desktop.ini
+/EDAvis/GUI/desktop.ini
+/EDAvis/desktop.ini
