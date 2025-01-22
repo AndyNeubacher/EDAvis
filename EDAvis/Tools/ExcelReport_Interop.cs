@@ -183,7 +183,7 @@ namespace EDAvis.Tools
             {
                 DataPoints ds = new DataPoints();
                 ds.Points = new List<double>();
-                ds.Points = range.Cast<object>().ToList().ConvertAll(x => Convert.ToDouble(x));
+                ds.Points = range.Cast<object>().ToList().ConvertAll(x => Convert.ToDouble(x)*4);
                 ds.Visible = false;
                 return ds;
             }

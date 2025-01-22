@@ -76,13 +76,13 @@
         "Entry"
         {
         "MsmKey" = "8:_622B53D2FCF07A968B830B7A2ECB8CDF"
-        "OwnerKey" = "8:_AAFFF9261C764941AEF591A4C3F4D6DB"
+        "OwnerKey" = "8:_F6D4BE45ED67C7CCA126503C8BF8CC5B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_622B53D2FCF07A968B830B7A2ECB8CDF"
-        "OwnerKey" = "8:_F6D4BE45ED67C7CCA126503C8BF8CC5B"
+        "OwnerKey" = "8:_AAFFF9261C764941AEF591A4C3F4D6DB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -160,13 +160,13 @@
         "Entry"
         {
         "MsmKey" = "8:_D35621CA508AE18F1DE463B14B470FF6"
-        "OwnerKey" = "8:_AAFFF9261C764941AEF591A4C3F4D6DB"
+        "OwnerKey" = "8:_B3DC5AC7C3D7C43994B2B5154097C6BE"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_D35621CA508AE18F1DE463B14B470FF6"
-        "OwnerKey" = "8:_B3DC5AC7C3D7C43994B2B5154097C6BE"
+        "OwnerKey" = "8:_AAFFF9261C764941AEF591A4C3F4D6DB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -733,7 +733,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -857,7 +857,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -1009,16 +1009,16 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:EDAvis V0.1.3"
-        "ProductCode" = "8:{D1EB8683-3C8D-48FA-99A9-CCB698F7C585}"
-        "PackageCode" = "8:{8CCE0CA7-5FB6-4203-88AA-4999EBAD9C7B}"
+        "ProductName" = "8:EDAvis V0.1.4"
+        "ProductCode" = "8:{E71CE24A-905A-4539-B376-40C83C6BE056}"
+        "PackageCode" = "8:{B9B66D65-9E83-4E11-A468-35AEDF9B5852}"
         "UpgradeCode" = "8:{DC029161-37CF-48FD-A7EE-ADF9CEC44BE5}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.1.3"
+        "ProductVersion" = "8:0.1.4"
         "Manufacturer" = "8:EEG Schattseit"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/AndyNeubacher/EDAvis"
@@ -1133,7 +1133,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_18C222020914444E8BD4B3119388BBA5"
             {
-            "Name" = "8:EDAvis V0.1.3"
+            "Name" = "8:EDAvis V0.1.4"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -1147,7 +1147,7 @@
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_2800B9DA5A184EE291E233287007DE9D"
             {
-            "Name" = "8:EDAvis V0.1.3"
+            "Name" = "8:EDAvis V0.1.4"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"

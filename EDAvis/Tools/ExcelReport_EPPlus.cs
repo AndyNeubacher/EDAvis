@@ -200,7 +200,7 @@ namespace EDAvis.Tools
                 foreach (var cell in range)
                 {
                     if (cell.Value != null)
-                        ds.Points.Add((double)cell.Value);
+                        ds.Points.Add((double)cell.Value*4);    // *4 -> interval is 15min ... therefore the excel-values are 1/4kWh
                     else
                         return null;
                 }
