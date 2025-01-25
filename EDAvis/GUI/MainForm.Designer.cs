@@ -59,7 +59,6 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.btnAll = new System.Windows.Forms.Button();
             this.btnNone = new System.Windows.Forms.Button();
-            this.btnUpdate = new System.Windows.Forms.Button();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.objectListView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
@@ -124,7 +123,7 @@
             this.lineToolStripMenuItem,
             this.barToolStripMenuItem});
             this.typeToolStripMenuItem.Name = "typeToolStripMenuItem";
-            this.typeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.typeToolStripMenuItem.Size = new System.Drawing.Size(99, 22);
             this.typeToolStripMenuItem.Text = "Type";
             // 
             // lineToolStripMenuItem
@@ -133,7 +132,7 @@
             this.lineToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.lineToolStripMenuItem.Enabled = false;
             this.lineToolStripMenuItem.Name = "lineToolStripMenuItem";
-            this.lineToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.lineToolStripMenuItem.Size = new System.Drawing.Size(96, 22);
             this.lineToolStripMenuItem.Text = "Line";
             this.lineToolStripMenuItem.Click += new System.EventHandler(this.lineToolStripMenuItem_Click);
             // 
@@ -141,7 +140,7 @@
             // 
             this.barToolStripMenuItem.Enabled = false;
             this.barToolStripMenuItem.Name = "barToolStripMenuItem";
-            this.barToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.barToolStripMenuItem.Size = new System.Drawing.Size(96, 22);
             this.barToolStripMenuItem.Text = "Bar";
             this.barToolStripMenuItem.Click += new System.EventHandler(this.barToolStripMenuItem_Click);
             // 
@@ -172,7 +171,7 @@
             this.überToolStripMenuItem.Name = "überToolStripMenuItem";
             this.überToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
             this.überToolStripMenuItem.Text = "Info";
-            this.überToolStripMenuItem.Click += new System.EventHandler(this.überToolStripMenuItem_Click);
+            this.überToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
             // objectListView
             // 
@@ -209,7 +208,7 @@
             this.objectListView.Location = new System.Drawing.Point(0, 35);
             this.objectListView.Name = "objectListView";
             this.objectListView.ShowImagesOnSubItems = true;
-            this.objectListView.Size = new System.Drawing.Size(445, 445);
+            this.objectListView.Size = new System.Drawing.Size(438, 445);
             this.objectListView.TabIndex = 1;
             this.objectListView.UseCompatibleStateImageBehavior = false;
             this.objectListView.UseSubItemCheckBoxes = true;
@@ -320,7 +319,7 @@
             this.SelectedDateFrom.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.SelectedDateFrom.Location = new System.Drawing.Point(3, 3);
             this.SelectedDateFrom.Name = "SelectedDateFrom";
-            this.SelectedDateFrom.Size = new System.Drawing.Size(112, 20);
+            this.SelectedDateFrom.Size = new System.Drawing.Size(131, 20);
             this.SelectedDateFrom.TabIndex = 3;
             // 
             // SelectedDateTo
@@ -328,9 +327,9 @@
             this.SelectedDateTo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SelectedDateTo.DropDownAlign = System.Windows.Forms.LeftRightAlignment.Right;
             this.SelectedDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.SelectedDateTo.Location = new System.Drawing.Point(322, 3);
+            this.SelectedDateTo.Location = new System.Drawing.Point(296, 3);
             this.SelectedDateTo.Name = "SelectedDateTo";
-            this.SelectedDateTo.Size = new System.Drawing.Size(114, 20);
+            this.SelectedDateTo.Size = new System.Drawing.Size(133, 20);
             this.SelectedDateTo.TabIndex = 5;
             // 
             // splitContainer
@@ -372,30 +371,29 @@
             // 
             this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel1.ColumnCount = 5;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 26.89464F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.40357F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.40357F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 15.40357F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 26.89464F));
-            this.tableLayoutPanel1.Controls.Add(this.btnAll, 3, 0);
+            this.tableLayoutPanel1.ColumnCount = 4;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 31.7917F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 18.2083F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 18.2083F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 31.7917F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Controls.Add(this.btnAll, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.btnNone, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.SelectedDateFrom, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.btnUpdate, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.SelectedDateTo, 4, 0);
+            this.tableLayoutPanel1.Controls.Add(this.SelectedDateTo, 3, 0);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(439, 26);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(432, 26);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
             // btnAll
             // 
             this.btnAll.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnAll.Location = new System.Drawing.Point(255, 3);
+            this.btnAll.Location = new System.Drawing.Point(218, 3);
             this.btnAll.Name = "btnAll";
-            this.btnAll.Size = new System.Drawing.Size(61, 20);
+            this.btnAll.Size = new System.Drawing.Size(72, 20);
             this.btnAll.TabIndex = 9;
             this.btnAll.Text = "Alle";
             this.btnAll.UseVisualStyleBackColor = true;
@@ -404,24 +402,13 @@
             // btnNone
             // 
             this.btnNone.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnNone.Location = new System.Drawing.Point(121, 3);
+            this.btnNone.Location = new System.Drawing.Point(140, 3);
             this.btnNone.Name = "btnNone";
-            this.btnNone.Size = new System.Drawing.Size(61, 20);
+            this.btnNone.Size = new System.Drawing.Size(72, 20);
             this.btnNone.TabIndex = 8;
             this.btnNone.Text = "Nichts";
             this.btnNone.UseVisualStyleBackColor = true;
             this.btnNone.Click += new System.EventHandler(this.btnNone_Click);
-            // 
-            // btnUpdate
-            // 
-            this.btnUpdate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnUpdate.Location = new System.Drawing.Point(188, 3);
-            this.btnUpdate.Name = "btnUpdate";
-            this.btnUpdate.Size = new System.Drawing.Size(61, 20);
-            this.btnUpdate.TabIndex = 7;
-            this.btnUpdate.Text = "Update";
-            this.btnUpdate.UseVisualStyleBackColor = true;
-            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
             // 
             // MainForm
             // 
@@ -473,7 +460,6 @@
         private BrightIdeasSoftware.OLVColumn cbToEEG;
         private System.Windows.Forms.SplitContainer splitContainer;
         private OxyPlot.WindowsForms.PlotView OxyPlotView;
-        private System.Windows.Forms.Button btnUpdate;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button btnAll;
         private System.Windows.Forms.Button btnNone;

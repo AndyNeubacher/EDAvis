@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 
 
@@ -11,10 +12,23 @@ namespace EDAvis
         public string Address;
     }
 
-    public class DataPoints
+    public class DataPoints : INotifyPropertyChanged
     {
-        public bool Visible = false;
+        private bool _visible;
+        public bool Visible
+        {
+            get { return _visible; }
+            set {
+                if (_visible != value)
+                {
+                    _visible = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Visible"));
+                }
+            }
+        }
         public List<double> Points;
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     public class DataSeries

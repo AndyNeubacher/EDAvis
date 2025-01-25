@@ -2,7 +2,9 @@
 using EDAvis.GUI;
 using EDAvis.Tools;
 using System;
+using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 
@@ -13,7 +15,6 @@ namespace EDAvis
     {
         private Plotter EGS_Plotter = null;
         private UserNamesAndDataPoints User_Data = null;
-
 
         public MainForm()
         {
@@ -50,6 +51,17 @@ namespace EDAvis
                     {
                         SelectedDateFrom.Value = User_Data.Timestamps[0];
                         SelectedDateTo.Value = User_Data.Timestamps[User_Data.Timestamps.Count - 1];
+
+                        // add custom eventhandler for SubItemsCheckboxes-Changed
+                        foreach (PowerMeter pm in User_Data.Data)
+                        {
+                            if (pm.Series.Consumed_Total_kWh != null)       pm.Series.Consumed_Total_kWh.PropertyChanged += SubItemCheckboxStateChanged;
+                            if (pm.Series.FromEEG_MaxAvaliable_kWh != null) pm.Series.FromEEG_MaxAvaliable_kWh.PropertyChanged += SubItemCheckboxStateChanged;
+                            if (pm.Series.FromEEG_Consumed_kWh != null)     pm.Series.FromEEG_Consumed_kWh.PropertyChanged += SubItemCheckboxStateChanged;
+                            if (pm.Series.Produced_Total_kWh != null)       pm.Series.Produced_Total_kWh.PropertyChanged += SubItemCheckboxStateChanged;
+                            if (pm.Series.ToGrid_kWh != null)               pm.Series.ToGrid_kWh.PropertyChanged += SubItemCheckboxStateChanged;
+                            if (pm.Series.ToEEG_kWh != null)                pm.Series.ToEEG_kWh.PropertyChanged += SubItemCheckboxStateChanged;
+                        }
                     }
 
                     objectListView.SetObjects(User_Data.Data);
@@ -115,7 +127,6 @@ namespace EDAvis
                 if(pm.Series.ToGrid_kWh != null) pm.Series.ToGrid_kWh.Visible = val;
                 if(pm.Series.ToEEG_kWh != null) pm.Series.ToEEG_kWh.Visible = val;
             }
-
             UpdateGraph();
         }
 
@@ -129,10 +140,15 @@ namespace EDAvis
             SetAllSubItemCheckboxes(true);
         }
 
-        private void überToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutForm about = new AboutForm();
             about.ShowDialog();
+        }
+
+        private void SubItemCheckboxStateChanged(object sender, PropertyChangedEventArgs e)
+        {
+            UpdateGraph();
         }
     }
 }

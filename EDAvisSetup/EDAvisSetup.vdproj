@@ -76,13 +76,13 @@
         "Entry"
         {
         "MsmKey" = "8:_622B53D2FCF07A968B830B7A2ECB8CDF"
-        "OwnerKey" = "8:_F6D4BE45ED67C7CCA126503C8BF8CC5B"
+        "OwnerKey" = "8:_AAFFF9261C764941AEF591A4C3F4D6DB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_622B53D2FCF07A968B830B7A2ECB8CDF"
-        "OwnerKey" = "8:_AAFFF9261C764941AEF591A4C3F4D6DB"
+        "OwnerKey" = "8:_F6D4BE45ED67C7CCA126503C8BF8CC5B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -160,13 +160,13 @@
         "Entry"
         {
         "MsmKey" = "8:_D35621CA508AE18F1DE463B14B470FF6"
-        "OwnerKey" = "8:_B3DC5AC7C3D7C43994B2B5154097C6BE"
+        "OwnerKey" = "8:_AAFFF9261C764941AEF591A4C3F4D6DB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_D35621CA508AE18F1DE463B14B470FF6"
-        "OwnerKey" = "8:_AAFFF9261C764941AEF591A4C3F4D6DB"
+        "OwnerKey" = "8:_B3DC5AC7C3D7C43994B2B5154097C6BE"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1009,16 +1009,16 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:EDAvis V0.1.4"
-        "ProductCode" = "8:{E71CE24A-905A-4539-B376-40C83C6BE056}"
-        "PackageCode" = "8:{B9B66D65-9E83-4E11-A468-35AEDF9B5852}"
+        "ProductName" = "8:EDAvis V0.1.5"
+        "ProductCode" = "8:{FC83BAD1-0D2C-4C30-A06F-CDAE21B12F3A}"
+        "PackageCode" = "8:{6AECF025-F609-47CA-9F40-A31CCE9CB3AD}"
         "UpgradeCode" = "8:{DC029161-37CF-48FD-A7EE-ADF9CEC44BE5}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.1.4"
+        "ProductVersion" = "8:0.1.5"
         "Manufacturer" = "8:EEG Schattseit"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/AndyNeubacher/EDAvis"
@@ -1133,7 +1133,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_18C222020914444E8BD4B3119388BBA5"
             {
-            "Name" = "8:EDAvis V0.1.4"
+            "Name" = "8:EDAvis V0.1.5"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -1147,7 +1147,7 @@
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_2800B9DA5A184EE291E233287007DE9D"
             {
-            "Name" = "8:EDAvis V0.1.4"
+            "Name" = "8:EDAvis V0.1.5"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
