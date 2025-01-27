@@ -208,7 +208,7 @@
             this.objectListView.Location = new System.Drawing.Point(0, 35);
             this.objectListView.Name = "objectListView";
             this.objectListView.ShowImagesOnSubItems = true;
-            this.objectListView.Size = new System.Drawing.Size(438, 445);
+            this.objectListView.Size = new System.Drawing.Size(437, 445);
             this.objectListView.TabIndex = 1;
             this.objectListView.UseCompatibleStateImageBehavior = false;
             this.objectListView.UseSubItemCheckBoxes = true;
@@ -329,7 +329,7 @@
             this.SelectedDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.SelectedDateTo.Location = new System.Drawing.Point(296, 3);
             this.SelectedDateTo.Name = "SelectedDateTo";
-            this.SelectedDateTo.Size = new System.Drawing.Size(133, 20);
+            this.SelectedDateTo.Size = new System.Drawing.Size(132, 20);
             this.SelectedDateTo.TabIndex = 5;
             // 
             // splitContainer
@@ -385,7 +385,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(432, 26);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(431, 26);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
             // btnAll

@@ -5,6 +5,8 @@ using OxyPlot.Series;
 using OxyPlot.Legends;
 using System;
 using System.Collections.Generic;
+using System.Windows.Input;
+using OxyPlot.Annotations;
 
 namespace EDAvis.Tools
 {
@@ -12,10 +14,11 @@ namespace EDAvis.Tools
     {
         private PlotView view = null;
         private PlotModel model = null;
+        private LineAnnotation cursorLine = null;
 
 
         public Plotter(PlotView plotview)
-        { 
+        {
             this.view = plotview;
             model = new PlotModel() { /*Title = "Diagnostic" */ };
 
@@ -119,6 +122,11 @@ namespace EDAvis.Tools
             ClearData();
             model.Axes.Add(new DateTimeAxis() { Position = AxisPosition.Bottom });
 
+            cursorLine = new LineAnnotation { Type = LineAnnotationType.Vertical, Color = OxyColors.Red, LineStyle = LineStyle.Dash };
+            model.Annotations.Add(cursorLine);
+            model.TrackerChanged += LiveGraph_TrackerChanged;
+
+
             PowerMeter pm;
             DataSeries ds;
             List<DateTime> ts;
@@ -142,8 +150,20 @@ namespace EDAvis.Tools
                 AddLine("ToEEG", pm, ts, ds.ToEEG_kWh, from_midnight, to_midnight);
 
                 // add tracker-format if a new LineSeries was created
-                if(model.Series.Count > 0)
+                if (model.Series.Count > 0)
                     model.Series[model.Series.Count - 1].TrackerFormatString = "{0}\n{2:dd-MM-yyyy HH:mm}: {4:0.000}kWh";
+            }
+        }
+
+        private void LiveGraph_TrackerChanged(object sender, TrackerEventArgs e)
+        {
+            if ((view.Model != null) && (model.Axes.Count > 1) && (e.HitResult != null))
+            {
+                var mousePosition = e.HitResult.Position;
+                var dataPoint = view.Model.DefaultXAxis.InverseTransform(mousePosition.X, mousePosition.Y, model.Axes[1]);
+                cursorLine.X = dataPoint.X;
+                cursorLine.Y = dataPoint.Y;
+                view.Model.InvalidatePlot(false);
             }
         }
 
@@ -151,9 +171,7 @@ namespace EDAvis.Tools
         {
             ClearData();
 
-            
-
-            var s1 = new BarSeries { Title = "Series 1", StrokeColor = OxyColors.Black, StrokeThickness = 1, IsStacked=true };
+            var s1 = new BarSeries { Title = "Series 1", StrokeColor = OxyColors.Black, StrokeThickness = 1, IsStacked = true };
             s1.Items.Add(new BarItem { Value = 25 });
             s1.Items.Add(new BarItem { Value = 137 });
             s1.Items.Add(new BarItem { Value = 18 });
@@ -170,57 +188,12 @@ namespace EDAvis.Tools
             categoryAxis.Labels.Add("Category B");
             categoryAxis.Labels.Add("Category C");
             categoryAxis.Labels.Add("Category D");
-            //var valueAxis = new LinearAxis { Position = AxisPosition.Left, MinimumPadding = 0, MaximumPadding = 0.06, AbsoluteMinimum = 0 };
 
             model.Series.Add(s1);
             model.Series.Add(s2);
-            //model.Axes.Add(valueAxis);
             model.Axes.Add(categoryAxis);
 
             return;
-
-            /*
-
-
-            PowerMeterData pm;
-            string legend_text;
-
-            for (int meter = 0; meter < data.PmData.Count; meter++)
-            {
-                pm = data.PmData[meter];
-
-                legend_text = pm.isConsumer ? "CON: " : "GEN: ";
-                legend_text += "AT**" + pm.PM_ID.Substring(pm.PM_ID.Length - 8) + ", " + pm.User.Name;
-
-                BarSeries bs = new BarSeries();
-                bs.IsStacked = true;
-                bs.Items.Add(new BarItem(20));
-                bs.Items.Add(new BarItem(60));
-
-                model.Series.Add(bs);
-
-                model.Axes[meter].Reset();
-                return;
-
-                //RectangleBarSeries rbs = new RectangleBarSeries() { Title = legend_text };
-                //model.Series.Add(rbs);
-                ////model.Axes.Add(NewAxis(meter + 1, rbs, AxisPosition.Left));
-
-                //for (int dp = 0; dp < pm.Data.Timestamp.Count; dp++)
-                //{
-                //    if ((pm.Data.Timestamp[dp] >= from) && (pm.Data.Timestamp[dp] <= to))
-                //    {
-                //        RectangleBarItem item = new RectangleBarItem() { }
-
-                //        if (pm.isConsumer)
-                //            (model.Series[meter] as RectangleBarSeries).Items.Add( (new DataPoint(DateTimeAxis.ToDouble(pm.Data.Timestamp[dp]), pm.Data.PowerFromEEG[dp]));      // used from EEG
-                //        else
-                //            (model.Series[meter] as LineSeries).Points.Add(new DataPoint(DateTimeAxis.ToDouble(pm.Data.Timestamp[dp]), pm.Data.PowerUsedTotal[dp]));    // fed to EEG
-                //    }
-                //}
-                //model.Axes[meter].Reset();
-            }
-            */
         }
 
         public void ClearData()
