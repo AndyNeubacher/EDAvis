@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 using OxyPlot.Annotations;
+using System.Text;
 
 namespace EDAvis.Tools
 {
@@ -27,7 +28,7 @@ namespace EDAvis.Tools
             {
                 LegendBackground = OxyColor.FromAColor(220, OxyColors.White),
                 LegendBorder = OxyColors.Black,
-                LegendBorderThickness = 1.0,
+                LegendBorderThickness = 1.0, 
                 LegendPlacement = LegendPlacement.Inside,
                 LegendPosition = LegendPosition.TopCenter,
                 LegendOrientation = LegendOrientation.Horizontal,
@@ -124,7 +125,9 @@ namespace EDAvis.Tools
 
             cursorLine = new LineAnnotation { Type = LineAnnotationType.Vertical, Color = OxyColors.Red, LineStyle = LineStyle.Dash };
             model.Annotations.Add(cursorLine);
-            model.TrackerChanged += LiveGraph_TrackerChanged;
+            model.TrackerChanged += LineGraph_TrackerChanged;
+            //view.MouseMove += LineGraph_MouseMove;
+
 
 
             PowerMeter pm;
@@ -155,7 +158,7 @@ namespace EDAvis.Tools
             }
         }
 
-        private void LiveGraph_TrackerChanged(object sender, TrackerEventArgs e)
+        private void LineGraph_TrackerChanged(object sender, TrackerEventArgs e)
         {
             if ((view.Model != null) && (model.Axes.Count > 1) && (e.HitResult != null))
             {
@@ -163,9 +166,65 @@ namespace EDAvis.Tools
                 var dataPoint = view.Model.DefaultXAxis.InverseTransform(mousePosition.X, mousePosition.Y, model.Axes[1]);
                 cursorLine.X = dataPoint.X;
                 cursorLine.Y = dataPoint.Y;
+
+                var sb = new StringBuilder();
+                sb.AppendLine($"X: {e.HitResult.DataPoint.X:F2}");
+                foreach (var series in model.Series)
+                {
+                    if (series is LineSeries)
+                    {
+
+                        var nearestPoint = series.GetNearestPoint(mousePosition, true);
+                        if (nearestPoint != null)
+                        {
+                            sb.AppendLine($"{series.Title}: {nearestPoint.DataPoint.Y:F2}");
+                            //sb.AppendLine($"{series.Title}: {nearestPoint. .Y:F2}");
+                        }
+                    }
+                }
+                Console.WriteLine(sb.ToString());
+
+
                 view.Model.InvalidatePlot(false);
             }
         }
+
+        private void LineGraph_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if ((view.Model != null) && (model.Axes.Count > 1))
+            {
+                var control = (System.Windows.Forms.Control)sender; // Get the control that raised the event
+                System.Drawing.Point point = control.PointToScreen(e.Location);
+                ScreenPoint screenPoint = new ScreenPoint(point.X, point.Y);
+
+                var mousePosition = e.Location;
+                var dataPoint = view.Model.DefaultXAxis.InverseTransform(mousePosition.X, mousePosition.Y, model.Axes[1]);
+                cursorLine.X = dataPoint.X;
+                cursorLine.Y = dataPoint.Y;
+
+
+                var sb = new StringBuilder();
+                //sb.AppendLine($"X: {e.HitResult.DataPoint.X:F2}");
+                foreach (var series in model.Series)
+                {
+                    if (series is LineSeries)
+                    {
+
+                        var nearestPoint = series.GetNearestPoint(screenPoint, false);
+                        if (nearestPoint != null)
+                        {
+                            sb.AppendLine($"{series.Title}: {nearestPoint.DataPoint.Y:F2}");
+                            //sb.AppendLine($"{series.Title}: {nearestPoint. .Y:F2}");
+                        }
+                    }
+                }
+                Console.WriteLine(sb.ToString());
+            }
+            view.Model.InvalidatePlot(false);
+        }
+
+
+
 
         public void ShowBarGraph(UserNamesAndDataPoints data, DateTime from, DateTime to)
         {

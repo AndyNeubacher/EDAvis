@@ -208,7 +208,7 @@
             this.objectListView.Location = new System.Drawing.Point(0, 35);
             this.objectListView.Name = "objectListView";
             this.objectListView.ShowImagesOnSubItems = true;
-            this.objectListView.Size = new System.Drawing.Size(437, 445);
+            this.objectListView.Size = new System.Drawing.Size(435, 445);
             this.objectListView.TabIndex = 1;
             this.objectListView.UseCompatibleStateImageBehavior = false;
             this.objectListView.UseSubItemCheckBoxes = true;
@@ -319,7 +319,7 @@
             this.SelectedDateFrom.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.SelectedDateFrom.Location = new System.Drawing.Point(3, 3);
             this.SelectedDateFrom.Name = "SelectedDateFrom";
-            this.SelectedDateFrom.Size = new System.Drawing.Size(131, 20);
+            this.SelectedDateFrom.Size = new System.Drawing.Size(130, 20);
             this.SelectedDateFrom.TabIndex = 3;
             // 
             // SelectedDateTo
@@ -327,9 +327,9 @@
             this.SelectedDateTo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SelectedDateTo.DropDownAlign = System.Windows.Forms.LeftRightAlignment.Right;
             this.SelectedDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.SelectedDateTo.Location = new System.Drawing.Point(296, 3);
+            this.SelectedDateTo.Location = new System.Drawing.Point(295, 3);
             this.SelectedDateTo.Name = "SelectedDateTo";
-            this.SelectedDateTo.Size = new System.Drawing.Size(132, 20);
+            this.SelectedDateTo.Size = new System.Drawing.Size(131, 20);
             this.SelectedDateTo.TabIndex = 5;
             // 
             // splitContainer
@@ -385,13 +385,13 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(431, 26);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(429, 26);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
             // btnAll
             // 
             this.btnAll.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnAll.Location = new System.Drawing.Point(218, 3);
+            this.btnAll.Location = new System.Drawing.Point(217, 3);
             this.btnAll.Name = "btnAll";
             this.btnAll.Size = new System.Drawing.Size(72, 20);
             this.btnAll.TabIndex = 9;
@@ -402,7 +402,7 @@
             // btnNone
             // 
             this.btnNone.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnNone.Location = new System.Drawing.Point(140, 3);
+            this.btnNone.Location = new System.Drawing.Point(139, 3);
             this.btnNone.Name = "btnNone";
             this.btnNone.Size = new System.Drawing.Size(72, 20);
             this.btnNone.TabIndex = 8;

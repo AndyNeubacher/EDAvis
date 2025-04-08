@@ -2,6 +2,7 @@
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 
@@ -57,14 +58,16 @@ namespace EDAvis.Tools
             usr.Data[usr.Data.Count - 1].DataQuality = xlsSheet.Cells[3, 16].Value.ToString();              // TOTAL data quality
 
             int r = xlsSheet.Dimension.Rows;
+            int last_row = xlsSheet.Dimension.Rows;
+            int start_row = RowIdxOfKeyword("Zählpunkt", xlsSheet.Cells[1, 1, last_row, 1]) + 1;
 
             // now lets find the PowerMeter ID's
-            for (int row = 8; row <= xlsSheet.Dimension.Rows; row++)
+            for (int row = start_row; row <= xlsSheet.Dimension.Rows; row++)
             {
                 usr.Data.Add(CreateEmptyPowerMeter());
                 usr.Data[usr.Data.Count - 1].Type = xlsSheet.Cells[row, 2].Value.ToString();                // CONSUMER / PRODUCER
                 usr.Data[usr.Data.Count - 1].PM_ID = xlsSheet.Cells[row, 1].Value.ToString();               // PowerMeter ID AT00300000000xxxxx
-                usr.Data[usr.Data.Count - 1].DataQuality = xlsSheet.Cells[row, 16].Value.ToString();        // data quality of each powermeter
+                usr.Data[usr.Data.Count - 1].DataQuality = ParseDataQuality(xlsSheet.Cells[row, 16].Value); // data quality of each powermeter
             }
         }
 
@@ -118,7 +121,11 @@ namespace EDAvis.Tools
                     // get correct index of already read userdata
                     var last_row = xlsSheet.Dimension.Rows;
 
-                    int pm_row = RowIdxOfKeyword("MeteringpointID", xlsSheet.Cells[1, 1, last_row, 1]);
+                    int pm_row = RowIdxOfKeyword("MeteringpointID", xlsSheet.Cells[1, 1, last_row, 1]);     // old-report
+                    if(pm_row == 0)
+                        pm_row = RowIdxOfKeyword("MeteringPointId", xlsSheet.Cells[1, 1, last_row, 1]);     // new-report
+                    
+
                     int list_idx = usr.Data.FindIndex(r => r.PM_ID == xlsSheet.Cells[pm_row, col].Value.ToString());
                     if (list_idx > -1)
                     {
@@ -126,7 +133,7 @@ namespace EDAvis.Tools
                         {
                             // get owner of power-meter
                             int name_row = RowIdxOfKeyword("Name", xlsSheet.Cells[1, 1, last_row, 1]);
-                            usr.Data[list_idx].User.Name = xlsSheet.Cells[name_row, col].Value.ToString();
+                            usr.Data[list_idx].User.Name = (xlsSheet.Cells[name_row, col].Value == null) ? "unknown" : xlsSheet.Cells[name_row, col].Value.ToString();
 
                             // get UsedTotal_kWh data
                             var rng_total = xlsSheet.Cells[start_row, col, last_row, col];
@@ -146,7 +153,7 @@ namespace EDAvis.Tools
                         {
                             // get owner of power-meter
                             int name_row = RowIdxOfKeyword("Name", xlsSheet.Cells[1, 1, last_row, 1]);
-                            usr.Data[list_idx].User.Name = xlsSheet.Cells[name_row, col].Value.ToString();
+                            usr.Data[list_idx].User.Name = (xlsSheet.Cells[name_row, col].Value == null) ? "unknown" : xlsSheet.Cells[name_row, col].Value.ToString();
 
                             // get Produced_kWh data
                             var gen_total = xlsSheet.Cells[start_row, col, last_row, col];
@@ -173,15 +180,39 @@ namespace EDAvis.Tools
             catch (Exception ex) { MessageBox.Show("Get_Consumer_DataPoints: --> " + ex.ToString()); }
         }
 
+        private static string ParseDataQuality(object val)
+        {
+            if (val == null)
+                return "invalid";
+            else if (val.ToString().Contains("L1"))
+                return "L1";
+            else if (val.ToString().Contains("L2"))
+                return "L2";
+            else if (val.ToString().Contains("L3"))
+                return "L3";
+            else
+                return "unknown";
+        }
+
         private static List<DateTime> RangeToDateTimeList(ExcelRange range)
         {
             try
             {
+                DateTime tmp = DateTime.MinValue;
                 List<DateTime> dt = new List<DateTime>();
                 foreach (var cell in range)
                 {
                     if (cell.Value != null)
-                        dt.Add(DateTime.FromOADate((double)cell.Value));
+                    {
+                        string format_old = "dd.MM.yyyy HH:mm:ss";
+                        string format_new = "yyyy-MM-dd HH:mm:ss";
+                        if (!DateTime.TryParseExact(cell.Value.ToString(), format_old, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                        {
+                            if (!DateTime.TryParseExact(cell.Value.ToString(), format_new, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                                return null;
+                        }
+                        dt.Add(tmp);
+                    }
                     else
                         return null;
                 }
