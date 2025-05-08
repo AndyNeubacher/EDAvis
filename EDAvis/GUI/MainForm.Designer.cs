@@ -59,6 +59,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.btnAll = new System.Windows.Forms.Button();
             this.btnNone = new System.Windows.Forms.Button();
+            this.monatsreportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.objectListView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
@@ -84,6 +85,7 @@
             // 
             this.MainMenuStrip.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileOpenToolStripMenuItem1,
+            this.monatsreportToolStripMenuItem,
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.MainMenuStrip.Name = "MainMenuStrip";
@@ -93,19 +95,19 @@
             // fileOpenToolStripMenuItem1
             // 
             this.fileOpenToolStripMenuItem1.Name = "fileOpenToolStripMenuItem1";
-            this.fileOpenToolStripMenuItem1.Size = new System.Drawing.Size(172, 22);
+            this.fileOpenToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.fileOpenToolStripMenuItem1.Text = "EDA Report öffnen";
             this.fileOpenToolStripMenuItem1.Click += new System.EventHandler(this.fileOpenToolStripMenuItem1_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(169, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "Beenden";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -123,7 +125,7 @@
             this.lineToolStripMenuItem,
             this.barToolStripMenuItem});
             this.typeToolStripMenuItem.Name = "typeToolStripMenuItem";
-            this.typeToolStripMenuItem.Size = new System.Drawing.Size(99, 22);
+            this.typeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.typeToolStripMenuItem.Text = "Type";
             // 
             // lineToolStripMenuItem
@@ -208,7 +210,7 @@
             this.objectListView.Location = new System.Drawing.Point(0, 35);
             this.objectListView.Name = "objectListView";
             this.objectListView.ShowImagesOnSubItems = true;
-            this.objectListView.Size = new System.Drawing.Size(435, 445);
+            this.objectListView.Size = new System.Drawing.Size(434, 445);
             this.objectListView.TabIndex = 1;
             this.objectListView.UseCompatibleStateImageBehavior = false;
             this.objectListView.UseSubItemCheckBoxes = true;
@@ -327,9 +329,9 @@
             this.SelectedDateTo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SelectedDateTo.DropDownAlign = System.Windows.Forms.LeftRightAlignment.Right;
             this.SelectedDateTo.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.SelectedDateTo.Location = new System.Drawing.Point(295, 3);
+            this.SelectedDateTo.Location = new System.Drawing.Point(293, 3);
             this.SelectedDateTo.Name = "SelectedDateTo";
-            this.SelectedDateTo.Size = new System.Drawing.Size(131, 20);
+            this.SelectedDateTo.Size = new System.Drawing.Size(132, 20);
             this.SelectedDateTo.TabIndex = 5;
             // 
             // splitContainer
@@ -385,15 +387,15 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(429, 26);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(428, 26);
             this.tableLayoutPanel1.TabIndex = 8;
             // 
             // btnAll
             // 
             this.btnAll.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnAll.Location = new System.Drawing.Point(217, 3);
+            this.btnAll.Location = new System.Drawing.Point(216, 3);
             this.btnAll.Name = "btnAll";
-            this.btnAll.Size = new System.Drawing.Size(72, 20);
+            this.btnAll.Size = new System.Drawing.Size(71, 20);
             this.btnAll.TabIndex = 9;
             this.btnAll.Text = "Alle";
             this.btnAll.UseVisualStyleBackColor = true;
@@ -404,11 +406,18 @@
             this.btnNone.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnNone.Location = new System.Drawing.Point(139, 3);
             this.btnNone.Name = "btnNone";
-            this.btnNone.Size = new System.Drawing.Size(72, 20);
+            this.btnNone.Size = new System.Drawing.Size(71, 20);
             this.btnNone.TabIndex = 8;
             this.btnNone.Text = "Nichts";
             this.btnNone.UseVisualStyleBackColor = true;
             this.btnNone.Click += new System.EventHandler(this.btnNone_Click);
+            // 
+            // monatsreportToolStripMenuItem
+            // 
+            this.monatsreportToolStripMenuItem.Name = "monatsreportToolStripMenuItem";
+            this.monatsreportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.monatsreportToolStripMenuItem.Text = "Monatsreport";
+            this.monatsreportToolStripMenuItem.Click += new System.EventHandler(this.monatsreportToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -463,6 +472,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button btnAll;
         private System.Windows.Forms.Button btnNone;
+        private System.Windows.Forms.ToolStripMenuItem monatsreportToolStripMenuItem;
     }
 }
 

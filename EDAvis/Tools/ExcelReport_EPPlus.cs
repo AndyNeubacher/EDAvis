@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Excel;
+﻿using BrightIdeasSoftware;
+using Microsoft.Office.Interop.Excel;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,25 @@ namespace EDAvis.Tools
 
 
             return result;
+        }
+
+        public static MonthlyReport GetMonthlyData(string xls_file)
+        {
+            MonthlyReport report = new MonthlyReport();
+            report.User = new List<MonthlyData>();
+
+            if (!File.Exists(xls_file))
+                return null;
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage(new FileInfo(xls_file)))
+            {
+                ExcelWorksheet worksheetOverview = package.Workbook.Worksheets[0];
+
+                Get_OverviewData(worksheetOverview, ref report);
+            }
+
+            return report;
         }
 
         private static PowerMeter CreateEmptyPowerMeter()
@@ -180,6 +200,82 @@ namespace EDAvis.Tools
             catch (Exception ex) { MessageBox.Show("Get_Consumer_DataPoints: --> " + ex.ToString()); }
         }
 
+        private static void Get_OverviewData(ExcelWorksheet xlsSheet, ref MonthlyReport rep)
+        {
+            try
+            {
+                // all datapoints needs to be "L1" quality -> otherwise it makes no sense!
+                string total_data_quality = ParseDataQuality(xlsSheet.Cells[3, 16].Value);
+                if (total_data_quality == null) {
+                    rep = null;
+                    return;
+                }
+                    
+                if (total_data_quality != "L1") {
+                    rep = null;
+                    return;
+                }
+
+
+                int last_row = xlsSheet.Dimension.Rows;
+                int start_row = RowIdxOfKeyword("Zählpunkt", xlsSheet.Cells[1, 1, last_row, 1]) + 1;
+
+                rep.NumConsumers = 0;
+                rep.NumProducers = 0;
+                rep.MonthOfYear = GetMonthFromDate(xlsSheet.Cells[start_row, 4]);
+
+
+                for (int row=start_row; row<=last_row; row++)
+                {
+                    MonthlyData data = new MonthlyData();
+
+                    data.PM_ID = xlsSheet.Cells[row, 1].Value.ToString();
+                    data.Type = xlsSheet.Cells[row, 2].Value.ToString();
+                    if (data.Type == "GENERATION")
+                        rep.NumProducers++;
+
+                    if (data.Type == "CONSUMPTION")
+                        rep.NumConsumers++;
+
+                    data.Consumed_Total_kWh = (double)xlsSheet.Cells[row, 6].Value;
+                    data.FromEEG_Consumed_kWh = (double)xlsSheet.Cells[row, 9].Value;
+                    data.Produced_Total_kWh = (double)xlsSheet.Cells[row, 11].Value;
+                    data.ToGrid_kWh = (double)xlsSheet.Cells[row, 14].Value;
+                    data.ToEEG_kWh = data.Produced_Total_kWh - data.ToGrid_kWh;
+
+                    rep.User.Add(data);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Get_OverviewData: --> " + ex.ToString());
+                rep = null;
+                return;
+            }
+        }
+
+        public static int GetMonthFromDate(ExcelRangeBase cell)
+        {
+            DateTime tmp = DateTime.MinValue;
+            List<DateTime> dt = new List<DateTime>();
+            if (cell.Value != null)
+            {
+                string format_old_short = "dd.MM.yyyy HH:mm";
+                string format_old = "dd.MM.yyyy HH:mm:ss";
+                string format_new = "yyyy-MM-dd HH:mm:ss";
+                if (!DateTime.TryParseExact(cell.Value.ToString(), format_old_short, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                {
+                    if (!DateTime.TryParseExact(cell.Value.ToString(), format_old, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                    {
+                        if (!DateTime.TryParseExact(cell.Value.ToString(), format_new, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                            return -1;
+                    }
+                }
+                return tmp.Month;
+            }
+            return -1;
+        }
+
         private static string ParseDataQuality(object val)
         {
             if (val == null)
@@ -204,12 +300,16 @@ namespace EDAvis.Tools
                 {
                     if (cell.Value != null)
                     {
+                        string format_old_short = "dd.MM.yyyy HH:mm";
                         string format_old = "dd.MM.yyyy HH:mm:ss";
                         string format_new = "yyyy-MM-dd HH:mm:ss";
-                        if (!DateTime.TryParseExact(cell.Value.ToString(), format_old, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                        if (!DateTime.TryParseExact(cell.Value.ToString(), format_old_short, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
                         {
-                            if (!DateTime.TryParseExact(cell.Value.ToString(), format_new, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
-                                return null;
+                            if (!DateTime.TryParseExact(cell.Value.ToString(), format_old, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                            {
+                                if (!DateTime.TryParseExact(cell.Value.ToString(), format_new, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                                    return null;
+                            }
                         }
                         dt.Add(tmp);
                     }

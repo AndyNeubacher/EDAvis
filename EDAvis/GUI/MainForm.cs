@@ -150,5 +150,11 @@ namespace EDAvis
         {
             UpdateGraph();
         }
+
+        private void monatsreportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ReportExtractor rep = new ReportExtractor();
+            rep.ShowDialog();
+        }
     }
 }

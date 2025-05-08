@@ -57,4 +57,26 @@ namespace EDAvis
         public List<DateTime> Timestamps;
         public List<PowerMeter> Data;
     }
+
+
+    public class MonthlyData
+    {
+        public string PM_ID;
+        public string Type;
+
+        public double Consumed_Total_kWh;        // tab2, col 2,12,22 [B]
+        public double FromEEG_Consumed_kWh;      // tab2, col 8,18,28 [H]
+
+        public double Produced_Total_kWh;        // tab2, col 1(generation)
+        public double ToGrid_kWh;                // tab2, col 7(generation)
+        public double ToEEG_kWh;                 // Produced_kWh - ToGrid_kWh
+    }
+
+    public class MonthlyReport
+    {
+        public int MonthOfYear;
+        public int NumConsumers;
+        public int NumProducers;
+        public List<MonthlyData> User;
+    }
 }
