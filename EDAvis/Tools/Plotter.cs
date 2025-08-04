@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Windows.Input;
 using OxyPlot.Annotations;
 using System.Text;
+using System.Windows.Forms;
 
 namespace EDAvis.Tools
 {
@@ -54,7 +55,7 @@ namespace EDAvis.Tools
         {
             LinearAxis linearAxis = new LinearAxis
             {
-                Title = "kWh",          //line.Title,
+                Title = "kW",          //line.Title,
                 Key = line.YAxisKey,
                 Position = pos,
 
@@ -89,8 +90,9 @@ namespace EDAvis.Tools
                 if (!dp.Visible)
                     return false;
 
-                if (time.Count != dp.Points.Count)
-                    return false;
+                //if (time.Count != dp.Points.Count)
+                //    MessageBox.Show("Excelreport contains more datapoints than expected!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //return false;
 
                 string legend_text = pm.Type.Substring(0, 3) + ": ";
                 legend_text += (pm.PM_ID.Length == 0) ? "" : "AT**" + pm.PM_ID.Substring(pm.PM_ID.Length - 6);

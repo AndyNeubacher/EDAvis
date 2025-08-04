@@ -54,6 +54,7 @@ namespace EDAvis.GUI
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var package = new ExcelPackage(new FileInfo(tbYear.Text)))
             {
+                int row = 0;
                 ExcelWorksheet ws = package.Workbook.Worksheets[0];
 
                 // check if in cell[6,2] we can find the beginning of the list
@@ -64,29 +65,43 @@ namespace EDAvis.GUI
                 int row_offset = 7;     // where the PM-ID's start
 
                 // now lets find the correct entry
-                for(int row = row_offset; row < mon_rep.User.Count + row_offset; row++)
+                for (row = row_offset; row < mon_rep.User.Count + row_offset; row++)
                 {
-                    // get PM-ID and direction from yearly-report (to verify)
-                    string year_dir = ws.Cells[row, 3].Value.ToString();
-                    string year_pm = ws.Cells[row, 2].Value.ToString();
+                    try
+                    {
+                        // get PM-ID and direction from yearly-report (to verify)
+                        string year_dir = ws.Cells[row, 3].Value.ToString();
+                        string year_pm = ws.Cells[row, 2].Value.ToString();
 
-                    int usr_idx = mon_rep.User.FindIndex(md => md.PM_ID == year_pm);
+                        int usr_idx = mon_rep.User.FindIndex(md => md.PM_ID == year_pm);
+                        if(usr_idx < 0)
+                        {
+                            MessageBox.Show("could not find " + year_pm + "in monthly report!");
+                            continue;
+                        }
+                            
 
-                    if (year_dir != mon_rep.User[usr_idx].Type)
-                        continue;
+                        if (year_dir != mon_rep.User[usr_idx].Type)
+                            continue;
 
-                    if (year_pm != mon_rep.User[usr_idx].PM_ID)
-                        continue;
+                        if (year_pm != mon_rep.User[usr_idx].PM_ID)
+                            continue;
 
-                    if (year_dir == "CONSUMPTION")
-                        ws.Cells[row, 5+mon_rep.MonthOfYear].Value = mon_rep.User[usr_idx].FromEEG_Consumed_kWh;
-                    if (year_dir == "GENERATION")
-                        ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = mon_rep.User[usr_idx].ToEEG_kWh * -1;
+                        if (year_dir == "CONSUMPTION")
+                            ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = mon_rep.User[usr_idx].FromEEG_Consumed_kWh;
+                        if (year_dir == "GENERATION")
+                            ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = mon_rep.User[usr_idx].ToEEG_kWh * -1;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("found new MeterPoint in montly report! -> add new line in yearly reportfile");
+                        return;
+                    }
                 }
 
                 // now fill the "TO-GRID-BLOCK"
                 row_offset += mon_rep.User.Count + 1;
-                for(int row = row_offset; row < mon_rep.NumProducers + row_offset; row++)
+                for(row = row_offset; row < mon_rep.NumProducers + row_offset; row++)
                 {
                     string year_dir = ws.Cells[row, 3].Value.ToString();
                     string year_pm = ws.Cells[row, 2].Value.ToString();
