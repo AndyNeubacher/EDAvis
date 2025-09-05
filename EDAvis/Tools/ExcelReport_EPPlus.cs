@@ -1,5 +1,4 @@
 ﻿using BrightIdeasSoftware;
-using Microsoft.Office.Interop.Excel;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -38,20 +37,24 @@ namespace EDAvis.Tools
             return result;
         }
 
-        public static MonthlyReport GetMonthlyData(string xls_file)
+        public static MonthlyReport GetMonthlyData(TextBox log, string xls_file)
         {
             MonthlyReport report = new MonthlyReport();
             report.User = new List<MonthlyData>();
 
             if (!File.Exists(xls_file))
+            {
+                log.AppendText("GetMonthlyData: file does not exist!\r\n");
                 return null;
+            }
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var package = new ExcelPackage(new FileInfo(xls_file)))
             {
-                ExcelWorksheet worksheetOverview = package.Workbook.Worksheets[0];
+                ExcelWorksheet wsOverview = package.Workbook.Worksheets[0];
+                ExcelWorksheet wsDataPoints = package.Workbook.Worksheets[1];
 
-                Get_OverviewData(worksheetOverview, ref report);
+                Get_OverviewData(log, wsOverview, ref report);
             }
 
             return report;
@@ -77,12 +80,12 @@ namespace EDAvis.Tools
             usr.Data[0].Type = "GESAMT";
             usr.Data[usr.Data.Count - 1].DataQuality = xlsSheet.Cells[3, 16].Value.ToString();              // TOTAL data quality
 
-            int r = xlsSheet.Dimension.Rows;
-            int last_row = xlsSheet.Dimension.Rows;
+            int r = xlsSheet.DimensionByValue.Rows;
+            int last_row = xlsSheet.DimensionByValue.Rows;
             int start_row = RowIdxOfKeyword("Zählpunkt", xlsSheet.Cells[1, 1, last_row, 1]) + 1;
 
             // now lets find the PowerMeter ID's
-            for (int row = start_row; row <= xlsSheet.Dimension.Rows; row++)
+            for (int row = start_row; row <= xlsSheet.DimensionByValue.Rows; row++)
             {
                 usr.Data.Add(CreateEmptyPowerMeter());
                 usr.Data[usr.Data.Count - 1].Type = xlsSheet.Cells[row, 2].Value.ToString();                // CONSUMER / PRODUCER
@@ -95,8 +98,8 @@ namespace EDAvis.Tools
         {
             try
             {
-                int last_col = xlsSheet.Dimension.Columns;
-                int last_row = xlsSheet.Dimension.Rows;
+                int last_col = xlsSheet.DimensionByValue.Columns;
+                int last_row = xlsSheet.DimensionByValue.Rows;
                 int start_row = RowIdxOfKeyword("Data Completeness", xlsSheet.Cells[1, 1, last_row, 1]) + 2;
 
                 // get TimeStamp for all datapoints
@@ -121,7 +124,7 @@ namespace EDAvis.Tools
 
                 // consumed Total in EEG
                 usr.Data[0].Series.ToEEG_kWh = new DataPoints();
-                usr.Data[0].Series.ToEEG_kWh.Points = new List<double>();
+                usr.Data[0].Series.ToEEG_kWh.Points = new List<double?>();
                 usr.Data[0].Series.ToEEG_kWh.Visible = false;
                 for (int i = 0; i < usr.Data[0].Series.Produced_Total_kWh.Points.Count; i++)
                     usr.Data[0].Series.ToEEG_kWh.Points.Add(usr.Data[0].Series.Produced_Total_kWh.Points[i] - usr.Data[0].Series.ToGrid_kWh.Points[i]);
@@ -134,12 +137,20 @@ namespace EDAvis.Tools
         {
             try
             {
-                int start_row = RowIdxOfKeyword("Data Completeness", xlsSheet.Cells[1, 1, xlsSheet.Dimension.Rows, 1]) + 2;
+                int start_row = RowIdxOfKeyword("Data Completeness", xlsSheet.Cells[1, 1, xlsSheet.DimensionByValue.Rows, 1]) + 2;
 
-                for (int col = 2; col <= xlsSheet.Dimension.Columns; )
+                int dt_data_period_start_row = RowIdxOfKeyword("Data Period Start", xlsSheet.Cells[1, 1, 20, 1]);
+                int dt_data_period_end_row = RowIdxOfKeyword("Data Period End", xlsSheet.Cells[1, 1, 20, 1]);
+                int dt_mp_active_start_row = RowIdxOfKeyword("Metering Point Active Start", xlsSheet.Cells[1, 1, 20, 1]);
+                int dt_mp_active_end_row = RowIdxOfKeyword("Metering Point Active End", xlsSheet.Cells[1, 1, 20, 1]);
+
+
+
+
+                for (int col = 2; col <= xlsSheet.DimensionByValue.Columns; )
                 {
                     // get correct index of already read userdata
-                    var last_row = xlsSheet.Dimension.Rows;
+                    var last_row = xlsSheet.DimensionByValue.Rows;
 
                     int pm_row = RowIdxOfKeyword("MeteringpointID", xlsSheet.Cells[1, 1, last_row, 1]);     // old-report
                     if(pm_row == 0)
@@ -154,6 +165,16 @@ namespace EDAvis.Tools
                             // get owner of power-meter
                             int name_row = RowIdxOfKeyword("Name", xlsSheet.Cells[1, 1, last_row, 1]);
                             usr.Data[list_idx].User.Name = (xlsSheet.Cells[name_row, col].Value == null) ? "unknown" : xlsSheet.Cells[name_row, col].Value.ToString();
+
+                            // get date where datapoints in the report should be present
+                            usr.Data[list_idx].Series.PM_DataPeriod = new DateTimeStartEnd();
+                            usr.Data[list_idx].Series.PM_DataPeriod.Start = ParseDateTime(xlsSheet.Cells[dt_data_period_start_row, col]);
+                            usr.Data[list_idx].Series.PM_DataPeriod.End = ParseDateTime(xlsSheet.Cells[dt_data_period_end_row, col]);
+
+                            // get date since when the powermeter is active in EEG
+                            usr.Data[list_idx].Series.PM_Active = new DateTimeStartEnd();
+                            usr.Data[list_idx].Series.PM_Active.Start = ParseDateTime(xlsSheet.Cells[dt_mp_active_start_row, col]);
+                            usr.Data[list_idx].Series.PM_Active.End = ParseDateTime(xlsSheet.Cells[dt_mp_active_end_row, col]);
 
                             // get UsedTotal_kWh data
                             var rng_total = xlsSheet.Cells[start_row, col, last_row, col];
@@ -175,6 +196,16 @@ namespace EDAvis.Tools
                             int name_row = RowIdxOfKeyword("Name", xlsSheet.Cells[1, 1, last_row, 1]);
                             usr.Data[list_idx].User.Name = (xlsSheet.Cells[name_row, col].Value == null) ? "unknown" : xlsSheet.Cells[name_row, col].Value.ToString();
 
+                            // get date where datapoints in the report should be present
+                            usr.Data[list_idx].Series.PM_DataPeriod = new DateTimeStartEnd();
+                            usr.Data[list_idx].Series.PM_DataPeriod.Start = ParseDateTime(xlsSheet.Cells[dt_data_period_start_row, col]);
+                            usr.Data[list_idx].Series.PM_DataPeriod.End = ParseDateTime(xlsSheet.Cells[dt_data_period_end_row, col]);
+
+                            // get date since when the powermeter is active in EEG
+                            usr.Data[list_idx].Series.PM_Active = new DateTimeStartEnd();
+                            usr.Data[list_idx].Series.PM_Active.Start = ParseDateTime(xlsSheet.Cells[dt_mp_active_start_row, col]);
+                            usr.Data[list_idx].Series.PM_Active.End = ParseDateTime(xlsSheet.Cells[dt_mp_active_end_row, col]);
+
                             // get Produced_kWh data
                             var gen_total = xlsSheet.Cells[start_row, col, last_row, col];
                             usr.Data[list_idx].Series.Produced_Total_kWh = RangeToDataPointClass(gen_total);
@@ -185,7 +216,7 @@ namespace EDAvis.Tools
 
                             // calc ToEEG_kWh and fill list
                             usr.Data[list_idx].Series.ToEEG_kWh = new DataPoints();
-                            usr.Data[list_idx].Series.ToEEG_kWh.Points = new List<double>();
+                            usr.Data[list_idx].Series.ToEEG_kWh.Points = new List<double?>();
                             usr.Data[list_idx].Series.ToEEG_kWh.Visible = false;
                             for (int i = 0; i < usr.Data[list_idx].Series.Produced_Total_kWh.Points.Count; i++)
                                 usr.Data[list_idx].Series.ToEEG_kWh.Points.Add(usr.Data[list_idx].Series.Produced_Total_kWh.Points[i] - usr.Data[list_idx].Series.ToGrid_kWh.Points[i]);
@@ -200,10 +231,22 @@ namespace EDAvis.Tools
             catch (Exception ex) { MessageBox.Show("Get_Consumer_DataPoints: --> " + ex.ToString()); }
         }
 
-        private static void Get_OverviewData(ExcelWorksheet xlsSheet, ref MonthlyReport rep)
+        private static void Get_OverviewData(TextBox log, ExcelWorksheet xlsSheet, ref MonthlyReport rep)
         {
             try
             {
+                rep.ReportStartDate = ParseDateTime(xlsSheet.Cells[3, 4]);
+                rep.ReportEndDate = ParseDateTime(xlsSheet.Cells[3, 5]);
+
+
+                // check the timespan -> must be one month!
+                if ((rep.ReportEndDate.Hour == 23) && (rep.ReportEndDate.Minute == 45))
+                    rep.ReportEndDate = rep.ReportEndDate.AddMinutes(15);
+
+                if (rep.ReportStartDate.AddMonths(1) != rep.ReportEndDate)
+                    log.AppendText("Get_OverviewData: timespan of the EDA report is not one month!\r\n");
+
+
                 // all datapoints needs to be "L1" quality -> otherwise it makes no sense!
                 string total_data_quality = ParseDataQuality(xlsSheet.Cells[3, 16].Value);
                 if (total_data_quality == null) {
@@ -217,7 +260,7 @@ namespace EDAvis.Tools
                 }
 
 
-                int last_row = xlsSheet.Dimension.Rows;
+                int last_row = xlsSheet.DimensionByValue.Rows;
                 int start_row = RowIdxOfKeyword("Zählpunkt", xlsSheet.Cells[1, 1, last_row, 1]) + 1;
 
                 rep.NumConsumers = 0;
@@ -248,11 +291,12 @@ namespace EDAvis.Tools
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Get_OverviewData: --> " + ex.ToString());
+                log.AppendText("Get_OverviewData: --> " + ex.ToString());
                 rep = null;
                 return;
             }
         }
+
 
         public static int GetMonthFromDate(ExcelRangeBase cell)
         {
@@ -275,6 +319,28 @@ namespace EDAvis.Tools
             }
             return -1;
         }
+
+        public static DateTime ParseDateTime(ExcelRangeBase cell)
+        {
+            if (cell.Value == null)
+                return DateTime.MinValue;
+
+            string date_str = cell.Value.ToString();
+            DateTime tmp = DateTime.MinValue;
+            string format_old_short = "dd.MM.yyyy HH:mm";
+            string format_old = "dd.MM.yyyy HH:mm:ss";
+            string format_new = "yyyy-MM-dd HH:mm:ss";
+            if (!DateTime.TryParseExact(date_str, format_old_short, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+            {
+                if (!DateTime.TryParseExact(date_str, format_old, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                {
+                    if (!DateTime.TryParseExact(date_str, format_new, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                        return DateTime.MinValue;
+                }
+            }
+            return tmp;
+        }
+
 
         private static string ParseDataQuality(object val)
         {
@@ -326,14 +392,19 @@ namespace EDAvis.Tools
             try
             {
                 DataPoints ds = new DataPoints();
-                ds.Points = new List<double>();
+                ds.Points = new List<double?>();
 
-                foreach (var cell in range)
+                // Get the dimensions of the range
+                int startRow = range.Start.Row;
+                int endRow = range.End.Row;
+                int startCol = range.Start.Column;
+
+                // Loop from the start row to the end row
+                for (int i = startRow; i <= endRow; i++)
                 {
-                    if (cell.Value != null)
-                        ds.Points.Add((double)cell.Value*4);    // *4 -> interval is 15min ... therefore the excel-values are 1/4kWh
-                    else
-                        return null;
+                    // Get the value of the cell and add it to the list as a nullable double.
+                    double? cellValue = range.Worksheet.Cells[i, startCol].GetValue<double?>();
+                    ds.Points.Add(cellValue);
                 }
 
                 ds.Visible = false;

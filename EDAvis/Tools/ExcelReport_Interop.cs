@@ -135,7 +135,7 @@ namespace EDAvis.Tools
 
                             // calc ToEEG_kWh and fill list
                             usr.Data[list_idx].Series.ToEEG_kWh = new DataPoints();
-                            usr.Data[list_idx].Series.ToEEG_kWh.Points = new List<double>();
+                            usr.Data[list_idx].Series.ToEEG_kWh.Points = new List<double?>();
                             usr.Data[list_idx].Series.ToEEG_kWh.Visible = false;
                             for (int i = 0; i < usr.Data[list_idx].Series.Produced_Total_kWh.Points.Count; i++)
                                 usr.Data[list_idx].Series.ToEEG_kWh.Points.Add(usr.Data[list_idx].Series.Produced_Total_kWh.Points[i] - usr.Data[list_idx].Series.ToGrid_kWh.Points[i]);
@@ -182,8 +182,8 @@ namespace EDAvis.Tools
             try
             {
                 DataPoints ds = new DataPoints();
-                ds.Points = new List<double>();
-                ds.Points = range.Cast<object>().ToList().ConvertAll(x => Convert.ToDouble(x)*4);
+                ds.Points = new List<double?>();
+                ds.Points = range.Cast<object>().ToList().ConvertAll(x => (double?)Convert.ToDouble(x) * 4);
                 ds.Visible = false;
                 return ds;
             }

@@ -12,6 +12,13 @@ namespace EDAvis
         public string Address;
     }
 
+    public class DateTimeStartEnd
+    {
+        public DateTime Start;
+        public DateTime End;
+    }
+
+
     public class DataPoints : INotifyPropertyChanged
     {
         private bool _visible;
@@ -26,7 +33,7 @@ namespace EDAvis
                 }
             }
         }
-        public List<double> Points;
+        public List<double?> Points;
 
         public event PropertyChangedEventHandler PropertyChanged;
     }
@@ -40,6 +47,9 @@ namespace EDAvis
         public DataPoints Produced_Total_kWh;        // tab2, col 1(generation)
         public DataPoints ToGrid_kWh;                // tab2, col 7(generation)
         public DataPoints ToEEG_kWh;                 // Produced_kWh - ToGrid_kWh
+
+        public DateTimeStartEnd PM_DataPeriod;       // tab2, row7/8
+        public DateTimeStartEnd PM_Active;           // tab2, row9/10
     }
 
     public class PowerMeter
@@ -59,6 +69,13 @@ namespace EDAvis
     }
 
 
+
+
+
+
+
+
+
     public class MonthlyData
     {
         public string PM_ID;
@@ -74,6 +91,8 @@ namespace EDAvis
 
     public class MonthlyReport
     {
+        public DateTime ReportStartDate;
+        public DateTime ReportEndDate;
         public int MonthOfYear;
         public int NumConsumers;
         public int NumProducers;

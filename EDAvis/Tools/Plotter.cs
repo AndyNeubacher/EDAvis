@@ -106,10 +106,15 @@ namespace EDAvis.Tools
                     model.Axes.Add(NewAxis(model.Axes.Count, line, AxisPosition.Left));
 
                 // now fill the datapoints
+                double val;
                 for (int i = 0; i < dp.Points.Count; i++)
                 {
+                    // convert from a nullable value to a normal double (0.0)
+                    val = dp.Points[i] ?? 0;
+                    val = val * 4;  // convert from kWh to kW (15min-intervals)
+
                     if ((time[i] >= from) && (time[i] <= to))
-                        line.Points.Add(new DataPoint(DateTimeAxis.ToDouble(time[i]), dp.Points[i]));
+                        line.Points.Add(new DataPoint(DateTimeAxis.ToDouble(time[i]), val));
                 }
 
                 model.Axes[0].Reset();
