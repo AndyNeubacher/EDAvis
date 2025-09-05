@@ -135,6 +135,7 @@
             this.tbExtractLog.Location = new System.Drawing.Point(18, 127);
             this.tbExtractLog.Multiline = true;
             this.tbExtractLog.Name = "tbExtractLog";
+            this.tbExtractLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.tbExtractLog.Size = new System.Drawing.Size(1064, 430);
             this.tbExtractLog.TabIndex = 8;
             // 
