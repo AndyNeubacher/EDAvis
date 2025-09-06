@@ -45,53 +45,148 @@ namespace EDAvis.GUI
             tbYear.Text = getExcelFileName();
         }
 
-        private void btnCopyMonthlyReport_TO_YearlyReport_Click(object sender, EventArgs e)
+        private void btnAnalyze_Click(object sender, EventArgs e)
         {
-            if (tbMonth.Text == "")
+            if (!File.Exists(tbMonth.Text))
             {
-                tbExtractLog.AppendText("\r\nselect monthly EDA-Report!\r\n");
-                return;
-            }
-            if (tbYear.Text == "")
-            {
-                tbExtractLog.AppendText("\r\nselect yearly report!\r\n");
+                tbExtractLog.AppendText("\r\nselect valid monthly EDA-Report!\r\n");
                 return;
             }
 
-            tbExtractLog.Clear();
-
-            // first get all detailed PM-data from monthly-report
-            UserNamesAndDataPoints pm_data = ExcelReport_EPPlus.GetData(tbMonth.Text);
-            if (pm_data == null)
-            {
-                tbExtractLog.AppendText("error getting all PM-data from monthly-report!\r\n");
-                return;
-            }
-
-            // now get the monthly overview
-            MonthlyReport mon_rep = ExcelReport_EPPlus.GetMonthlyData(tbExtractLog, tbMonth.Text);
-            if (mon_rep == null)
-            {
-                tbExtractLog.AppendText("error getting monthly overview!\r\n");
-                return;
-            }
-
-            // now check if we are missing data in the monthly-report
-            bool ok = CheckForMissingData(pm_data, mon_rep, tbExtractLog);
-
-            if (ok == true)
-            {
-                DialogResult result = MessageBox.Show("missing data in EDA-Report! ... want to fill data to yearly-report anyway?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                if (result == DialogResult.Yes)
-                    FillDataToYearlyReport(tbExtractLog, mon_rep);
-            }
+            AnalyzeAndMerge(tbExtractLog, tbMonth.Text, null);
         }
 
 
-        private void FillDataToYearlyReport(TextBox log, MonthlyReport mon_rep)
+        private void btnAnalyzeAndMerge_Click(object sender, EventArgs e)
         {
+            if (!File.Exists(tbMonth.Text))
+            {
+                tbExtractLog.AppendText("\r\nselect valid monthly EDA-Report!\r\n");
+                return;
+            }
+            if (!File.Exists(tbYear.Text))
+            {
+                tbExtractLog.AppendText("\r\nselect valid yearly report!\r\n");
+                return;
+            }
+
+            AnalyzeAndMerge(tbExtractLog, tbMonth.Text, tbYear.Text);
+        }
+
+
+
+        private bool AnalyzeAndMerge(TextBox log, string f_month, string f_year)
+        {
+            if(f_month == null)
+                return false;
+
+
+            log.Clear();
+            log.Refresh();
+            log.AppendText("analyzing monthly-report: " + f_month + "\r\n");
+
+            // first get all detailed PM-data from monthly-report
+            UserNamesAndDataPoints pm_data = ExcelReport_EPPlus.GetData(f_month);
+            if (pm_data == null)
+            {
+                log.AppendText("error getting all PM-data from monthly-report!\r\n");
+                return false;
+            }
+
+            // now get the monthly overview
+            MonthlyReport mon_rep = ExcelReport_EPPlus.GetMonthlyData(log, f_month);
+            if (mon_rep == null)
+            {
+                log.AppendText("error getting monthly overview!\r\n");
+                return false;
+            }
+
+            // now check if we are missing data in the monthly-report
+            bool report_valid = IsMonthlyReportValid(pm_data, mon_rep, log);
+
+            if (f_year != null)
+            {
+                if (!report_valid)
+                {
+                    DialogResult result = MessageBox.Show("missing data in EDA-Report! ... want to fill data to yearly-report anyway?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+                    if (result != DialogResult.Yes)
+                        return false;
+
+                    log.AppendText("filling data to yearly-report despite missing data!\r\n");
+                }
+
+                report_valid = FillDataToYearlyReport(log, mon_rep, f_year);
+            }
+            return report_valid;
+        }
+
+
+        private bool IsMonthlyReportValid(UserNamesAndDataPoints pm_data, MonthlyReport mon_rep, TextBox log)
+        {
+            bool report_valid = true;
+
+            // first check if we have the same number of PM-ID's  (idx0 = TOTAL and not a real/valid PM)
+            if (pm_data.Data.Count != (mon_rep.User.Count + 1))
+            {
+                log.AppendText("number of PM-ID's in monthly-report does not match!\r\n");
+                report_valid = false;
+            }
+
+
+            // now check if all PM-ID's are present
+            foreach (var pm in pm_data.Data)
+            {
+                if (pm.Type == "GESAMT")
+                    continue;
+
+                // find the index of this PM-ID in the monthly-report
+                int idx = mon_rep.User.FindIndex(md => md.PM_ID == pm.PM_ID);
+                if (idx < 0)
+                {
+                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + " is missing in monthly-report!\r\n");
+                    report_valid = false;
+                    continue;
+                }
+
+                // check if the powermeter is/was active in the reported month
+                if ((mon_rep.ReportStartDate >= pm.Series.PM_Active.End) || (mon_rep.ReportEndDate <= pm.Series.PM_Active.Start))
+                {
+                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + " was not active in the monthly report!\r\n");
+                    continue;
+                }
+
+                // check if the powermeter has missing datapoints in the reported month
+                int data_row_start = pm_data.Timestamps.FindIndex(ts => ts >= pm.Series.PM_DataPeriod.Start);
+                int data_row_end = pm_data.Timestamps.FindIndex(ts => ts >= pm.Series.PM_DataPeriod.End);
+                int points_missing = 0;
+
+                // check if we miss some data-points
+                for (int i = data_row_start; i < data_row_end; i++)
+                {
+                    if ((pm.Type == "CONSUMPTION") && (pm.Series.FromEEG_Consumed_kWh.Points[i] == null))
+                        points_missing++;
+                    if ((pm.Type == "GENERATION") && (pm.Series.ToEEG_kWh.Points[i] == null))
+                        points_missing++;
+                }
+
+                // make log -entry if we miss some data-points
+                if (points_missing > 0)
+                {
+                    report_valid = false;
+                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + ": missing " + points_missing + " datapoints!\r\n");
+                }
+            }
+
+            return report_valid;
+        }
+
+
+        private bool FillDataToYearlyReport(TextBox log, MonthlyReport mon_rep, string f_year)
+        {
+            log.AppendText("filling data to yearly-report: " + f_year + "\r\n");
+
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            using (var package = new ExcelPackage(new FileInfo(tbYear.Text)))
+            using (var package = new ExcelPackage(new FileInfo(f_year)))
             {
                 int row = 0;
                 ExcelWorksheet ws = package.Workbook.Worksheets[0];
@@ -101,7 +196,7 @@ namespace EDAvis.GUI
                 if (check_zp != "Zählpunkt")
                 {
                     log.AppendText("could not find beginning of list in yearly-report!\r\n");
-                    return;
+                    return false;
                 }
 
                 int row_offset = 7;     // where the PM-ID's start
@@ -137,7 +232,7 @@ namespace EDAvis.GUI
                     catch (Exception ex)
                     {
                         log.AppendText(ex.ToString());
-                        return;
+                        return false;
                     }
                 }
 
@@ -159,67 +254,7 @@ namespace EDAvis.GUI
 
                 log.AppendText("written to yearly report!");
             }
-        }
-
-
-
-        private bool CheckForMissingData(UserNamesAndDataPoints pm_data, MonthlyReport mon_rep, TextBox log)
-        {
-            bool missing_data = false;
-
-            // first check if we have the same number of PM-ID's  (idx0 = TOTAL and not a real/valid PM)
-            if (pm_data.Data.Count != (mon_rep.User.Count + 1))
-            {
-                log.AppendText("number of PM-ID's in monthly-report does not match!\r\n");
-                missing_data = true;
-            }
-
-
-            // now check if all PM-ID's are present
-            foreach (var pm in pm_data.Data)
-            {
-                if (pm.Type == "GESAMT")
-                    continue;
-
-                // find the index of this PM-ID in the monthly-report
-                int idx = mon_rep.User.FindIndex(md => md.PM_ID == pm.PM_ID);
-                if (idx < 0)
-                {
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + " is missing in monthly-report!\r\n");
-                    missing_data = true;
-                    continue;
-                }
-
-                // check if the powermeter is/was active in the reported month
-                if ((mon_rep.ReportStartDate >= pm.Series.PM_Active.End) || (mon_rep.ReportEndDate <= pm.Series.PM_Active.Start))
-                {
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + " was not active in the monthly report!\r\n");
-                    continue;
-                }
-
-                // check if the powermeter has missing datapoints in the reported month
-                int data_row_start = pm_data.Timestamps.FindIndex(ts => ts >= pm.Series.PM_DataPeriod.Start);
-                int data_row_end = pm_data.Timestamps.FindIndex(ts => ts >= pm.Series.PM_DataPeriod.End);
-                int points_missing = 0;
-
-                // check if we miss some data-points
-                for (int i = data_row_start; i < data_row_end; i++)
-                {
-                    if ((pm.Type == "CONSUMPTION") && (pm.Series.FromEEG_Consumed_kWh.Points[i] == null))
-                        points_missing++;
-                    if ((pm.Type == "GENERATION") && (pm.Series.ToEEG_kWh.Points[i] == null))
-                        points_missing++;
-                }
-
-                // make log -entry if we miss some data-points
-                if (points_missing > 0)
-                {
-                    missing_data = true;
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + ": missing " + points_missing + " datapoints!\r\n");
-                }
-            }
-
-            return missing_data;
+            return true;
         }
     }
 }

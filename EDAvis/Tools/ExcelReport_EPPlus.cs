@@ -42,12 +42,6 @@ namespace EDAvis.Tools
             MonthlyReport report = new MonthlyReport();
             report.User = new List<MonthlyData>();
 
-            if (!File.Exists(xls_file))
-            {
-                log.AppendText("GetMonthlyData: file does not exist!\r\n");
-                return null;
-            }
-
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var package = new ExcelPackage(new FileInfo(xls_file)))
             {
@@ -144,7 +138,14 @@ namespace EDAvis.Tools
                 int dt_mp_active_start_row = RowIdxOfKeyword("Metering Point Active Start", xlsSheet.Cells[1, 1, 20, 1]);
                 int dt_mp_active_end_row = RowIdxOfKeyword("Metering Point Active End", xlsSheet.Cells[1, 1, 20, 1]);
 
-
+                // if this value is 0 -> we have an old report version -> try to find with other keywords
+                if (dt_data_period_start_row == 0)
+                {
+                    dt_data_period_start_row = RowIdxOfKeyword("Period start", xlsSheet.Cells[1, 1, 20, 1]);
+                    dt_data_period_end_row = RowIdxOfKeyword("Period end", xlsSheet.Cells[1, 1, 20, 1]);
+                    dt_mp_active_start_row = RowIdxOfKeyword("Metering Point active start", xlsSheet.Cells[1, 1, 20, 1]);
+                    dt_mp_active_end_row = RowIdxOfKeyword("Metering Point active end", xlsSheet.Cells[1, 1, 20, 1]);
+                }
 
 
                 for (int col = 2; col <= xlsSheet.DimensionByValue.Columns; )
