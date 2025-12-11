@@ -113,10 +113,14 @@ namespace EDAvis.GUI
                         return false;
 
                     log.AppendText("filling data to yearly-report despite missing data!\r\n");
+                    return FillDataToYearlyReport(log, mon_rep, f_year);
                 }
 
-                report_valid = FillDataToYearlyReport(log, mon_rep, f_year);
+                log.AppendText("filling data to yearly-report\r\n");
+                return FillDataToYearlyReport(log, mon_rep, f_year);
             }
+
+            log.AppendText("finished!\r\n");
             return report_valid;
         }
 
@@ -143,7 +147,7 @@ namespace EDAvis.GUI
                 int idx = mon_rep.User.FindIndex(md => md.PM_ID == pm.PM_ID);
                 if (idx < 0)
                 {
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + " is missing in monthly-report!\r\n");
+                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") is missing in monthly-report!\r\n");
                     report_valid = false;
                     continue;
                 }
@@ -151,7 +155,7 @@ namespace EDAvis.GUI
                 // check if the powermeter is/was active in the reported month
                 if ((mon_rep.ReportStartDate >= pm.Series.PM_Active.End) || (mon_rep.ReportEndDate <= pm.Series.PM_Active.Start))
                 {
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + " was not active in the monthly report!\r\n");
+                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") was not active in the monthly report!\r\n");
                     continue;
                 }
 
@@ -173,7 +177,7 @@ namespace EDAvis.GUI
                 if (points_missing > 0)
                 {
                     report_valid = false;
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") " + ": missing " + points_missing + " datapoints!\r\n");
+                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + "): missing " + points_missing + " datapoints!\r\n");
                 }
             }
 
@@ -201,8 +205,28 @@ namespace EDAvis.GUI
 
                 int row_offset = 7;     // where the PM-ID's start
 
+                // Find the next row starting from row_offset where column=2 has a null/empty value
+                int nextEmptyRow = -1;
+                int maxRow = ws.Dimension?.End?.Row ?? (row_offset + mon_rep.User.Count + mon_rep.NumProducers + 50); // fallback
+                for (int r = row_offset; r <= maxRow; r++)
+                {
+                    var cell = ws.Cells[r, 2];
+                    // consider cell missing, Value == null or empty text as "empty"
+                    if (cell == null || cell.Value == null || string.IsNullOrWhiteSpace(cell.Text))
+                    {
+                        nextEmptyRow = r;
+                        break;
+                    }
+                }
+
+                if (nextEmptyRow < 0)
+                {
+                    log.AppendText("could not find next empty PM-ID cell in yearly-report starting from row " + row_offset + "!\r\n");
+                    return false;
+                }
+
                 // now lets find the correct entry
-                for (row = row_offset; row < mon_rep.User.Count + row_offset; row++)
+                for (row = row_offset; row < nextEmptyRow; row++)
                 {
                     try
                     {
@@ -213,7 +237,7 @@ namespace EDAvis.GUI
                         int usr_idx = mon_rep.User.FindIndex(md => md.PM_ID == year_pm);
                         if (usr_idx < 0)
                         {
-                            log.AppendText("could not find " + year_pm + "in monthly report!\r\n");
+                            log.AppendText("could not find " + year_pm + " in monthly report!\r\n");
                             continue;
                         }
 
@@ -237,12 +261,17 @@ namespace EDAvis.GUI
                 }
 
                 // now fill the "TO-GRID-BLOCK"
-                row_offset += mon_rep.User.Count + 1;
-                for (row = row_offset; row < mon_rep.NumProducers + row_offset; row++)
+                for (row = nextEmptyRow + 1; row < (nextEmptyRow - row_offset); row++)
                 {
                     string year_dir = ws.Cells[row, 3].Value.ToString();
                     string year_pm = ws.Cells[row, 2].Value.ToString();
                     int usr_idx = mon_rep.User.FindIndex(md => md.PM_ID == year_pm);
+
+                    if (usr_idx < 0)
+                    {
+                        log.AppendText("could not find " + year_pm + "in monthly report!\r\n");
+                        continue;
+                    }
 
                     if (year_pm != mon_rep.User[usr_idx].PM_ID)
                         continue;
