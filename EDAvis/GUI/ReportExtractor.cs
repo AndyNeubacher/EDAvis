@@ -261,7 +261,7 @@ namespace EDAvis.GUI
                 }
 
                 // now fill the "TO-GRID-BLOCK"
-                for (row = nextEmptyRow + 1; row < (nextEmptyRow - row_offset); row++)
+                for (row = nextEmptyRow + 1; row <= (nextEmptyRow + mon_rep.NumProducers); row++)
                 {
                     string year_dir = ws.Cells[row, 3].Value.ToString();
                     string year_pm = ws.Cells[row, 2].Value.ToString();
