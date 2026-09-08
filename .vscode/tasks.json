@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "EDAvis\\EDAvis.csproj",
+                "-p:Configuration=Debug",
+                "-p:Platform=AnyCPU",
+                "-nologo",
+                "-verbosity:minimal"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build (Release)",
+            "type": "shell",
+            "command": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "args": [
+                "EDAvis\\EDAvis.csproj",
+                "-p:Configuration=Release",
+                "-p:Platform=AnyCPU",
+                "-nologo",
+                "-verbosity:minimal"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
