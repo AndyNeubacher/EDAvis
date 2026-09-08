@@ -85,15 +85,7 @@ namespace EDAvis.GUI
             log.Refresh();
             log.AppendText("analyzing monthly-report: " + f_month + "\r\n");
 
-            // first get all detailed PM-data from monthly-report
-            UserNamesAndDataPoints pm_data = ExcelReport_EPPlus.GetData(f_month);
-            if (pm_data == null)
-            {
-                log.AppendText("error getting all PM-data from monthly-report!\r\n");
-                return false;
-            }
-
-            // now get the monthly overview
+            // get the monthly overview (one row per Zählpunkt, "Detailübersicht" sheet)
             MonthlyReport mon_rep = ExcelReport_EPPlus.GetMonthlyData(log, f_month);
             if (mon_rep == null)
             {
@@ -101,19 +93,15 @@ namespace EDAvis.GUI
                 return false;
             }
 
-            // now check if we are missing data in the monthly-report
-            bool report_valid = IsMonthlyReportValid(pm_data, mon_rep, log);
+            // now check if the report data is marked complete enough to be merged
+            bool report_valid = IsMonthlyReportValid(mon_rep, log);
 
             if (f_year != null)
             {
                 if (!report_valid)
                 {
-                    DialogResult result = MessageBox.Show("missing data in EDA-Report! ... want to fill data to yearly-report anyway?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-                    if (result != DialogResult.Yes)
-                        return false;
-
-                    log.AppendText("filling data to yearly-report despite missing data!\r\n");
-                    return FillDataToYearlyReport(log, mon_rep, f_year);
+                    log.AppendText("monthly-report contains incomplete data ('Vollständig' fehlt) -> Übernahme in Jahresreport abgebrochen!\r\n");
+                    return false;
                 }
 
                 log.AppendText("filling data to yearly-report\r\n");
@@ -125,59 +113,27 @@ namespace EDAvis.GUI
         }
 
 
-        private bool IsMonthlyReportValid(UserNamesAndDataPoints pm_data, MonthlyReport mon_rep, TextBox log)
+        private bool IsMonthlyReportValid(MonthlyReport mon_rep, TextBox log)
         {
             bool report_valid = true;
 
-            // first check if we have the same number of PM-ID's  (idx0 = TOTAL and not a real/valid PM)
-            if (pm_data.Data.Count != (mon_rep.User.Count + 1))
+            if ((mon_rep.NumConsumers + mon_rep.NumProducers) == 0)
             {
-                log.AppendText("number of PM-ID's in monthly-report does not match!\r\n");
-                report_valid = false;
+                log.AppendText("keine Zählpunkte im Monatsreport gefunden!\r\n");
+                return false;
             }
 
-
-            // now check if all PM-ID's are present
-            foreach (var pm in pm_data.Data)
+            // copying into the yearly report is only allowed once every Zählpunkt is marked "Vollständig"
+            foreach (var user in mon_rep.User)
             {
-                if (pm.Type == "GESAMT")
-                    continue;
-
-                // find the index of this PM-ID in the monthly-report
-                int idx = mon_rep.User.FindIndex(md => md.PM_ID == pm.PM_ID);
-                if (idx < 0)
+                if (!user.IsComplete)
                 {
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") is missing in monthly-report!\r\n");
+                    log.AppendText(user.PM_ID + ": Datenübermittlung ist nicht 'Vollständig'!\r\n");
                     report_valid = false;
-                    continue;
                 }
-
-                // check if the powermeter is/was active in the reported month
-                if ((mon_rep.ReportStartDate >= pm.Series.PM_Active.End) || (mon_rep.ReportEndDate <= pm.Series.PM_Active.Start))
+                else if (user.DataQuality != "L1")
                 {
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + ") was not active in the monthly report!\r\n");
-                    continue;
-                }
-
-                // check if the powermeter has missing datapoints in the reported month
-                int data_row_start = pm_data.Timestamps.FindIndex(ts => ts >= pm.Series.PM_DataPeriod.Start);
-                int data_row_end = pm_data.Timestamps.FindIndex(ts => ts >= pm.Series.PM_DataPeriod.End);
-                int points_missing = 0;
-
-                // check if we miss some data-points
-                for (int i = data_row_start; i < data_row_end; i++)
-                {
-                    if ((pm.Type == "CONSUMPTION") && (pm.Series.FromEEG_Consumed_kWh.Points[i] == null))
-                        points_missing++;
-                    if ((pm.Type == "GENERATION") && (pm.Series.ToEEG_kWh.Points[i] == null))
-                        points_missing++;
-                }
-
-                // make log -entry if we miss some data-points
-                if (points_missing > 0)
-                {
-                    report_valid = false;
-                    log.AppendText(pm.PM_ID + " (" + pm.User.Name + "): missing " + points_missing + " datapoints!\r\n");
+                    log.AppendText(user.PM_ID + ": Datenqualität ist '" + user.DataQuality + "' (nicht L1)!\r\n");
                 }
             }
 
@@ -238,15 +194,22 @@ namespace EDAvis.GUI
                         if (usr_idx < 0)
                         {
                             log.AppendText("could not find " + year_pm + " in monthly report!\r\n");
+                            ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = 0;
                             continue;
                         }
 
 
                         if (year_dir != mon_rep.User[usr_idx].Type)
+                        {
+                            ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = 0;
                             continue;
+                        }
 
                         if (year_pm != mon_rep.User[usr_idx].PM_ID)
+                        {
+                            ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = 0;
                             continue;
+                        }
 
                         if (year_dir == "CONSUMPTION")
                             ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = mon_rep.User[usr_idx].FromEEG_Consumed_kWh;
@@ -270,11 +233,15 @@ namespace EDAvis.GUI
                     if (usr_idx < 0)
                     {
                         log.AppendText("could not find " + year_pm + "in monthly report!\r\n");
+                        ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = 0;
                         continue;
                     }
 
                     if (year_pm != mon_rep.User[usr_idx].PM_ID)
+                    {
+                        ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = 0;
                         continue;
+                    }
 
                     ws.Cells[row, 5 + mon_rep.MonthOfYear].Value = mon_rep.User[usr_idx].ToGrid_kWh;
                 }

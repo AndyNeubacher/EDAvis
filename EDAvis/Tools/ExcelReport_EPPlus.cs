@@ -45,10 +45,9 @@ namespace EDAvis.Tools
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var package = new ExcelPackage(new FileInfo(xls_file)))
             {
-                ExcelWorksheet wsOverview = package.Workbook.Worksheets[0];
-                ExcelWorksheet wsDataPoints = package.Workbook.Worksheets[1];
+                ExcelWorksheet wsDetail = package.Workbook.Worksheets[1];   // "Detailübersicht"
 
-                Get_OverviewData(log, wsOverview, ref report);
+                Get_OverviewData(log, wsDetail, ref report);
             }
 
             return report;
@@ -232,62 +231,79 @@ namespace EDAvis.Tools
             catch (Exception ex) { MessageBox.Show("Get_Consumer_DataPoints: --> " + ex.ToString()); }
         }
 
+        // Neues Monatsreport-Format: eine Zeile je Zählpunkt in "Detailübersicht" statt einer
+        // 15-Min-Zeitreihe. Details siehe MonatsBericht-Format-Migration.md.
+        private static string TranslateEnergierichtung(string energierichtung)
+        {
+            if (energierichtung == "VERBRAUCH")
+                return "CONSUMPTION";
+            if (energierichtung == "ERZEUGUNG")
+                return "GENERATION";
+            return energierichtung;
+        }
+
         private static void Get_OverviewData(TextBox log, ExcelWorksheet xlsSheet, ref MonthlyReport rep)
         {
             try
             {
-                rep.ReportStartDate = ParseDateTime(xlsSheet.Cells[3, 4]);
-                rep.ReportEndDate = ParseDateTime(xlsSheet.Cells[3, 5]);
+                rep.ReportStartDate = ParseDateTime(xlsSheet.Cells[4, 2]);   // B4 "Auswertungszeitraum von"
+                rep.ReportEndDate = ParseDateTime(xlsSheet.Cells[5, 2]);     // B5 "Auswertungszeitraum bis"
 
-
-                // check the timespan -> must be one month!
-                if ((rep.ReportEndDate.Hour == 23) && (rep.ReportEndDate.Minute == 45))
-                    rep.ReportEndDate = rep.ReportEndDate.AddMinutes(15);
-
-                if (rep.ReportStartDate.AddMonths(1) != rep.ReportEndDate)
+                // check the timespan -> must be one month! (dates have no time component anymore)
+                if (rep.ReportStartDate.AddMonths(1) != rep.ReportEndDate.AddDays(1))
                     log.AppendText("Get_OverviewData: timespan of the EDA report is not one month!\r\n");
 
-
-                // all datapoints needs to be "L1" quality -> otherwise it makes no sense!
-                string total_data_quality = ParseDataQuality(xlsSheet.Cells[3, 16].Value);
-                if (total_data_quality == null) {
-                    rep = null;
-                    return;
-                }
-                    
-                if (total_data_quality != "L1") {
-                    rep = null;
-                    return;
-                }
-
-
                 int last_row = xlsSheet.DimensionByValue.Rows;
-                int start_row = RowIdxOfKeyword("Zählpunkt", xlsSheet.Cells[1, 1, last_row, 1]) + 1;
+                int start_row = RowIdxOfKeyword("Energiedaten je Zählpunkt", xlsSheet.Cells[1, 8, last_row, 8], 8) + 1;
 
                 rep.NumConsumers = 0;
                 rep.NumProducers = 0;
-                rep.MonthOfYear = GetMonthFromDate(xlsSheet.Cells[start_row, 4]);
+                rep.MonthOfYear = -1;
 
-
-                for (int row=start_row; row<=last_row; row++)
+                for (int row = start_row; row <= last_row; row++)
                 {
-                    MonthlyData data = new MonthlyData();
+                    string pm_id = xlsSheet.Cells[row, 2].Value?.ToString().Trim();   // B: Zählpunktnummer
+                    if (string.IsNullOrEmpty(pm_id))
+                        continue;
 
-                    data.PM_ID = xlsSheet.Cells[row, 1].Value.ToString();
-                    data.Type = xlsSheet.Cells[row, 2].Value.ToString();
-                    if (data.Type == "GENERATION")
-                        rep.NumProducers++;
+                    MonthlyData data = new MonthlyData();
+                    data.PM_ID = pm_id;
+
+                    string energierichtung = xlsSheet.Cells[row, 3].Value?.ToString();  // C: Energierichtung
+                    data.Type = TranslateEnergierichtung(energierichtung);
+
+                    data.IsComplete = xlsSheet.Cells[row, 17].Value?.ToString() == "Vollständig";  // Q: Datenübermittlung
+                    data.DataQuality = ParseDataQuality(xlsSheet.Cells[row, 18].Value);            // R: Datenqualität
+
+                    if (rep.MonthOfYear < 0)
+                        rep.MonthOfYear = xlsSheet.Cells[row, 5].GetValue<int>();   // E: Monat
 
                     if (data.Type == "CONSUMPTION")
+                    {
                         rep.NumConsumers++;
-
-                    data.Consumed_Total_kWh = (double)xlsSheet.Cells[row, 6].Value;
-                    data.FromEEG_Consumed_kWh = (double)xlsSheet.Cells[row, 9].Value;
-                    data.Produced_Total_kWh = (double)xlsSheet.Cells[row, 11].Value;
-                    data.ToGrid_kWh = (double)xlsSheet.Cells[row, 14].Value;
-                    data.ToEEG_kWh = data.Produced_Total_kWh - data.ToGrid_kWh;
+                        data.Consumed_Total_kWh = xlsSheet.Cells[row, 8].GetValue<double>();      // H
+                        data.FromEEG_Consumed_kWh = xlsSheet.Cells[row, 11].GetValue<double>();   // K
+                    }
+                    else if (data.Type == "GENERATION")
+                    {
+                        rep.NumProducers++;
+                        data.Produced_Total_kWh = xlsSheet.Cells[row, 13].GetValue<double>();     // M
+                        data.ToGrid_kWh = xlsSheet.Cells[row, 16].GetValue<double>();              // P
+                        data.ToEEG_kWh = data.Produced_Total_kWh - data.ToGrid_kWh;
+                    }
+                    else
+                    {
+                        log.AppendText(pm_id + ": unbekannte Energierichtung '" + energierichtung + "'!\r\n");
+                        continue;
+                    }
 
                     rep.User.Add(data);
+                }
+
+                if (rep.User.Count == 0)
+                {
+                    log.AppendText("Get_OverviewData: keine Zählpunkt-Daten in der Detailübersicht gefunden!\r\n");
+                    rep = null;
                 }
             }
             catch (Exception ex)
@@ -296,29 +312,6 @@ namespace EDAvis.Tools
                 rep = null;
                 return;
             }
-        }
-
-
-        public static int GetMonthFromDate(ExcelRangeBase cell)
-        {
-            DateTime tmp = DateTime.MinValue;
-            List<DateTime> dt = new List<DateTime>();
-            if (cell.Value != null)
-            {
-                string format_old_short = "dd.MM.yyyy HH:mm";
-                string format_old = "dd.MM.yyyy HH:mm:ss";
-                string format_new = "yyyy-MM-dd HH:mm:ss";
-                if (!DateTime.TryParseExact(cell.Value.ToString(), format_old_short, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
-                {
-                    if (!DateTime.TryParseExact(cell.Value.ToString(), format_old, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
-                    {
-                        if (!DateTime.TryParseExact(cell.Value.ToString(), format_new, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
-                            return -1;
-                    }
-                }
-                return tmp.Month;
-            }
-            return -1;
         }
 
         public static DateTime ParseDateTime(ExcelRangeBase cell)
@@ -331,12 +324,16 @@ namespace EDAvis.Tools
             string format_old_short = "dd.MM.yyyy HH:mm";
             string format_old = "dd.MM.yyyy HH:mm:ss";
             string format_new = "yyyy-MM-dd HH:mm:ss";
+            string format_date_only = "dd.MM.yyyy";
             if (!DateTime.TryParseExact(date_str, format_old_short, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
             {
                 if (!DateTime.TryParseExact(date_str, format_old, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
                 {
                     if (!DateTime.TryParseExact(date_str, format_new, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
-                        return DateTime.MinValue;
+                    {
+                        if (!DateTime.TryParseExact(date_str, format_date_only, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                            return DateTime.MinValue;
+                    }
                 }
             }
             return tmp;
@@ -370,12 +367,16 @@ namespace EDAvis.Tools
                         string format_old_short = "dd.MM.yyyy HH:mm";
                         string format_old = "dd.MM.yyyy HH:mm:ss";
                         string format_new = "yyyy-MM-dd HH:mm:ss";
+                        string format_date_only = "dd.MM.yyyy";
                         if (!DateTime.TryParseExact(cell.Value.ToString(), format_old_short, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
                         {
                             if (!DateTime.TryParseExact(cell.Value.ToString(), format_old, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
                             {
                                 if (!DateTime.TryParseExact(cell.Value.ToString(), format_new, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
-                                    return null;
+                                {
+                                    if (!DateTime.TryParseExact(cell.Value.ToString(), format_date_only, CultureInfo.InvariantCulture, DateTimeStyles.None, out tmp))
+                                        return null;
+                                }
                             }
                         }
                         dt.Add(tmp);
@@ -414,18 +415,19 @@ namespace EDAvis.Tools
             catch { return null; }
         }
 
-        private static int RowIdxOfKeyword(string keyword, ExcelRange range)
+        private static int RowIdxOfKeyword(string keyword, ExcelRange range, int col = 1)
         {
+            // NOTE: EPPlus's range[row, col] indexer uses ABSOLUTE worksheet coordinates,
+            // not coordinates relative to "range" - so the column to search must be passed explicitly.
             int num_rows = range.Rows;
             try
             {
                 for(int row=1; row< num_rows; row++)
                 {
-                    if (range[row, 1].Value == null)
+                    if (range[row, col].Value == null)
                         continue;
 
-                    string x = range[row, 1].Value.ToString();
-                    if (range[row, 1].Value.ToString() == keyword)
+                    if (range[row, col].Value.ToString() == keyword)
                         return row;
                 }
             } catch { }

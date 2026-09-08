@@ -81,12 +81,15 @@ namespace EDAvis
         public string PM_ID;
         public string Type;
 
-        public double Consumed_Total_kWh;        // tab2, col 2,12,22 [B]
-        public double FromEEG_Consumed_kWh;      // tab2, col 8,18,28 [H]
+        public double Consumed_Total_kWh;        // Detailübersicht col H
+        public double FromEEG_Consumed_kWh;      // Detailübersicht col K
 
-        public double Produced_Total_kWh;        // tab2, col 1(generation)
-        public double ToGrid_kWh;                // tab2, col 7(generation)
-        public double ToEEG_kWh;                 // Produced_kWh - ToGrid_kWh
+        public double Produced_Total_kWh;        // Detailübersicht col M
+        public double ToGrid_kWh;                // Detailübersicht col P (Restüberschuss bei EG und je ZP)
+        public double ToEEG_kWh;                 // Produced_Total_kWh - ToGrid_kWh
+
+        public bool IsComplete;                  // Detailübersicht col Q == "Vollständig"
+        public string DataQuality;               // Detailübersicht col R ("L1"/"L2"/"L3")
     }
 
     public class MonthlyReport
